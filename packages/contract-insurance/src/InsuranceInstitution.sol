@@ -1,12 +1,20 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.0;
 
+import {ECDSA} from "solady/utils/ECDSA.sol";
+import {ERC20} from "solady/tokens/ERC20.sol";
+
 contract InsuranceInstitution {
     error UserAlreadyRegistered(address walletAddress);
     error InvalidPlanId(uint planId);
-    error UserNotRegistered(address walletAddress);
+    error UserNotRegistered();
     error AlreadySubscribedToPlan(address walletAddress);
     error MedicalInstitutionAlreadyRegistered(address contractAddress);
+    error MedicalInstitutionNotRegistered();
+    error MedicalInstitutionNotAuthorizedByUser();
+    error InvalidUserSignature();
+    error InsufficientUserCoverage();
+    error USDCTransferFailed();
 
     event NewUserRegistered(uint userId, address walletAddress);
     event UserSubscribedToPlan(uint userId, address walletAddress, uint planId);
@@ -17,6 +25,7 @@ contract InsuranceInstitution {
         string name
     );
     event PlanValidityUpdated(uint planId, bool isValid);
+    event ClaimProcessed(uint userId, address medicalInstitution, uint amount);
 
     struct User {
         uint id;
@@ -74,7 +83,14 @@ contract InsuranceInstitution {
     MedicalInstitution[] public medicalInstitutions;
     mapping(address => uint) public addressToMedicalInstitutionId;
 
-    mapping(uint => mapping(uint => bool)) UserAuthorizedMedicalInstitutions;
+    // starts at 1 because 0 is used as a special value
+    mapping(uint => mapping(uint => uint)) userIdToAuthorizedMedicalInstitutionIdToNonce;
+
+    address usdcContractAddress;
+
+    constructor(address _usdcContractAddress) {
+        usdcContractAddress = _usdcContractAddress;
+    }
 
     function isPlanValid(
         InsurancePlan memory _plan
@@ -112,7 +128,7 @@ contract InsuranceInstitution {
     function subscribeToPlan(uint _planId) public {
         User storage _user = users[addressToUserId[msg.sender]];
         if (!isUserRegistered(_user)) {
-            revert UserNotRegistered(msg.sender);
+            revert UserNotRegistered();
         }
         if (_planId >= plans.length || _planId < 0) {
             revert InvalidPlanId(_planId);
@@ -175,5 +191,62 @@ contract InsuranceInstitution {
             _contractAddress,
             _name
         );
+    }
+
+    // hash schema: <userId><medicalInstitutionId><claimAmount><nonce>
+    function processClaim(
+        bytes memory _signature,
+        uint _userId,
+        uint _claimAmount,
+        uint _nonce
+    ) public {
+        MedicalInstitution memory _medicalInstitution = medicalInstitutions[
+            addressToMedicalInstitutionId[msg.sender]
+        ];
+        if (!isMedicalInstitutionRegistered(_medicalInstitution))
+            revert MedicalInstitutionNotRegistered();
+
+        User memory _user = users[_userId];
+
+        if (!isUserRegistered(_user)) revert UserNotRegistered();
+
+        if (
+            userIdToAuthorizedMedicalInstitutionIdToNonce[_user.id][
+                _medicalInstitution.id
+            ] == 0
+        ) revert MedicalInstitutionNotAuthorizedByUser();
+
+        bytes32 _messageHash = keccak256(
+            abi.encodePacked(
+                _user.id,
+                _medicalInstitution.id,
+                _claimAmount,
+                _nonce
+            )
+        );
+        bytes32 _prefixedHash = ECDSA.toEthSignedMessageHash(_messageHash);
+        address _signer = ECDSA.recover(_prefixedHash, _signature);
+
+        if (_signer != _user.walletAddress) revert InvalidUserSignature();
+
+        if (_user.remainingCoverage < _claimAmount)
+            revert InsufficientUserCoverage();
+
+        require(
+            users[_userId].remainingCoverage >= _claimAmount,
+            "Insufficient remaining coverage."
+        );
+
+        users[_userId].remainingCoverage -= _claimAmount;
+
+        ERC20 usdc = ERC20(usdcContractAddress);
+        bool success = usdc.transfer(msg.sender, _claimAmount);
+        if (!success) revert USDCTransferFailed();
+
+        userIdToAuthorizedMedicalInstitutionIdToNonce[_user.id][
+            _medicalInstitution.id
+        ] += 1;
+
+        emit ClaimProcessed(_userId, msg.sender, _claimAmount);
     }
 }
