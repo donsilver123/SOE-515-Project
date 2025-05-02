@@ -5,10 +5,10 @@ import {Script, console} from "forge-std/Script.sol";
 import {InsuranceInstitution} from "../src/InsuranceInstitution.sol";
 
 contract InsuranceInstitutionScript is Script {
-    function run() public {
+    function run(address _usdcContractAddress) public {
         vm.startBroadcast();
 
-        new InsuranceInstitution();
+        new InsuranceInstitution(_usdcContractAddress);
 
         vm.stopBroadcast();
     }

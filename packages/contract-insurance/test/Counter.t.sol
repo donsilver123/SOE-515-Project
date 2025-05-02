@@ -7,7 +7,5 @@ import {InsuranceInstitution} from "../src/InsuranceInstitution.sol";
 contract InsuranceInstitutionTest is Test {
     InsuranceInstitution public institution;
 
-    function setUp() public {
-        institution = new Counter();
-    }
+    function setUp() public {}
 }

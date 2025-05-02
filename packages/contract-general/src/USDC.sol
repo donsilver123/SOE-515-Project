@@ -21,6 +21,6 @@ contract USDC is ERC20 {
     }
 
     function decimals() public view virtual override returns (uint8) {
-        return 2;
+        return 6;
     }
 }

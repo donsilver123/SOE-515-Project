@@ -3,8 +3,9 @@ pragma solidity >=0.8.0;
 
 import {ECDSA} from "solady/utils/ECDSA.sol";
 import {ERC20} from "solady/tokens/ERC20.sol";
+import {IInsuranceInstitution} from "./IInsuranceInstitution.sol";
 
-contract InsuranceInstitution {
+contract InsuranceInstitution is IInsuranceInstitution {
     error UserAlreadyRegistered(address walletAddress);
     error InvalidPlanId(uint planId);
     error UserNotRegistered();
@@ -87,7 +88,7 @@ contract InsuranceInstitution {
     // starts at 1 because 0 is used as a special value
     mapping(uint => mapping(uint => uint)) userIdToAuthorizedMedicalInstitutionIdToNonce;
 
-    address usdcContractAddress;
+    address public immutable usdcContractAddress;
 
     constructor(address _usdcContractAddress) {
         usdcContractAddress = _usdcContractAddress;
