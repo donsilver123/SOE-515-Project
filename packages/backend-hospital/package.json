@@ -1,5 +1,6 @@
 {
-  "name": "@soe511/backend-insurance",
+	"$schema": "https://json.schemastore.org/package.json",
+  "name": "@soe511/backend-hospital",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "soe511",
+  "scripts": {
+    "dev": "dotenv -e .env -- ./scripts/dev.sh"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^8.0.0"
+  }
+}

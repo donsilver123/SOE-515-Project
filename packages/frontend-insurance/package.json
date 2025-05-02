@@ -1,4 +1,5 @@
 {
+	"$schema": "https://json.schemastore.org/package.json",
   "name": "@soe511/frontend-insurance",
   "private": true,
   "type": "module",

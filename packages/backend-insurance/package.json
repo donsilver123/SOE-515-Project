@@ -1,4 +1,5 @@
 {
+	"$schema": "https://json.schemastore.org/package.json",
   "name": "@soe511/backend-insurance",
   "type": "module",
   "scripts": {

@@ -1,10 +1,11 @@
 {
+	"$schema": "https://json.schemastore.org/package.json",
   "name": "@soe511/frontend-insurance",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3000",
-    "start": "vite --port 3000",
+    "dev": "vite --port 3001",
+    "start": "vite --port 3001",
     "build": "vite build && tsc",
     "serve": "vite preview",
     "test": "vitest run",
