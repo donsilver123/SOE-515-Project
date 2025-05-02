@@ -15,6 +15,7 @@ contract InsuranceInstitution {
     error InvalidUserSignature();
     error InsufficientUserCoverage();
     error USDCTransferFailed();
+    error InsufficientRemainingUserCcoverage();
 
     event NewUserRegistered(uint userId, address walletAddress);
     event UserSubscribedToPlan(uint userId, address walletAddress, uint planId);
@@ -25,7 +26,7 @@ contract InsuranceInstitution {
         string name
     );
     event PlanValidityUpdated(uint planId, bool isValid);
-    event ClaimProcessed(uint userId, address medicalInstitution, uint amount);
+    event ClaimProcessed(uint userId, uint medicalInstitutionId, uint amount);
 
     struct User {
         uint id;
@@ -232,21 +233,22 @@ contract InsuranceInstitution {
         if (_user.remainingCoverage < _claimAmount)
             revert InsufficientUserCoverage();
 
-        require(
-            users[_userId].remainingCoverage >= _claimAmount,
-            "Insufficient remaining coverage."
-        );
+        if (users[_userId].remainingCoverage < _claimAmount)
+            revert InsufficientRemainingUserCcoverage();
 
         users[_userId].remainingCoverage -= _claimAmount;
 
         ERC20 usdc = ERC20(usdcContractAddress);
-        bool success = usdc.transfer(msg.sender, _claimAmount);
+        bool success = usdc.transfer(
+            _medicalInstitution.contractAddress,
+            _claimAmount
+        );
         if (!success) revert USDCTransferFailed();
 
         userIdToAuthorizedMedicalInstitutionIdToNonce[_user.id][
             _medicalInstitution.id
         ] += 1;
 
-        emit ClaimProcessed(_userId, msg.sender, _claimAmount);
+        emit ClaimProcessed(_userId, _medicalInstitution.id, _claimAmount);
     }
 }
