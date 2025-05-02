@@ -1,0 +1,20 @@
+{
+  "framework": "react",
+  "typescript": true,
+  "projectName": "frontend-insurance",
+  "mode": "file-router",
+  "tailwind": true,
+  "packageManager": "pnpm",
+  "toolchain": "biome",
+  "variableValues": {},
+  "git": true,
+  "version": 1,
+  "existingAddOns": [
+    "form",
+    "shadcn",
+    "store",
+    "t3env",
+    "table",
+    "tanstack-query"
+  ]
+}
