@@ -1,10 +1,14 @@
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
+import { isAddress, getAddress } from "viem";
+
+export const addressSchema = z
+	.string()
+	.refine((addr) => !!isAddress(addr), { message: "not a valid address" })
+	.transform((addr) => getAddress(addr));
 
 export const env = createEnv({
-	server: {
-		SERVER_URL: z.string().url().optional(),
-	},
+	server: {},
 
 	/**
 	 * The prefix that client-side variables must have. This is enforced both at
@@ -13,7 +17,9 @@ export const env = createEnv({
 	clientPrefix: "VITE_",
 
 	client: {
-		VITE_APP_TITLE: z.string().min(1).optional(),
+		VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS: addressSchema,
+		VITE_INSURANCE_INSTITUTION_API_URL: z.string().url(),
+		VITE_DOMAIN: z.string(),
 	},
 
 	/**
