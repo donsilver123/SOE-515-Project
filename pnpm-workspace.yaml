@@ -1,3 +1,5 @@
 ---
 packages:
-- ./packages/*
+- ./packages/insurance/*
+- ./packages/medical/*
+- ./packages/shared/*
