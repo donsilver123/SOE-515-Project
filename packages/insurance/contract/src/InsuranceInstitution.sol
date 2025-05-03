@@ -85,13 +85,24 @@ contract InsuranceInstitution is IInsuranceInstitution {
     MedicalInstitution[] public medicalInstitutions;
     mapping(address => uint) public addressToMedicalInstitutionId;
 
-    // starts at 1 because 0 is used as a special value
     mapping(uint => mapping(uint => uint)) userIdToAuthorizedMedicalInstitutionIdToNonce;
 
     address public immutable usdcContractAddress;
 
     constructor(address _usdcContractAddress) {
         usdcContractAddress = _usdcContractAddress;
+    }
+
+    function getPlanById(uint _planId) public view returns (InsurancePlan memory) {
+        return plans[_planId];
+    }
+
+    function getPlans() public view returns (InsurancePlan[] memory) {
+        return plans;
+    }
+
+    function getUserById(uint _userId) public view returns (User memory) {
+        return users[_userId];
     }
 
     function isPlanValid(
@@ -153,8 +164,8 @@ contract InsuranceInstitution is IInsuranceInstitution {
         _newPlan.id = plans.length;
         _newPlan.name = _name;
         _newPlan.coverageLimit = _coverageLimit;
-        _newPlan.coveredConditions = _coveredConditions;
         _newPlan.isValid = true;
+        _newPlan.coveredConditions = _coveredConditions;
 
         emit InsurancePlanAdded(_newPlan.id, _name, _coverageLimit);
     }

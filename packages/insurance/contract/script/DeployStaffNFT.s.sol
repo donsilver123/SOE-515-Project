@@ -2,13 +2,13 @@
 pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
-import {USDC} from "../src/USDC.sol";
+import {StaffNFT} from "../src/StaffNFT.sol";
 
-contract DeployUSDCScript is Script {
-    function run() public {
+contract DeployStaffNFTScript is Script {
+    function run(string memory _serverBaseUrl) public {
         vm.startBroadcast();
 
-        new USDC();
+        new StaffNFT(_serverBaseUrl);
 
         vm.stopBroadcast();
     }

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@soe511/insurance-contract",
+  "name": "@soe511/shared-contract",
   "scripts": {
     "deploy": "./script/deploy.sh"
   },

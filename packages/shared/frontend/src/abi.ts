@@ -45,6 +45,78 @@ export const insuranceInstitutionAbi = [
   },
   {
     type: 'function',
+    inputs: [{ name: '_planId', internalType: 'uint256', type: 'uint256' }],
+    name: 'getPlanById',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct InsuranceInstitution.InsurancePlan',
+        type: 'tuple',
+        components: [
+          { name: 'id', internalType: 'uint256', type: 'uint256' },
+          { name: 'name', internalType: 'string', type: 'string' },
+          { name: 'coverageLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'isValid', internalType: 'bool', type: 'bool' },
+          {
+            name: 'coveredConditions',
+            internalType: 'enum InsuranceInstitution.CoveredCondition[]',
+            type: 'uint8[]',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getPlans',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct InsuranceInstitution.InsurancePlan[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'id', internalType: 'uint256', type: 'uint256' },
+          { name: 'name', internalType: 'string', type: 'string' },
+          { name: 'coverageLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'isValid', internalType: 'bool', type: 'bool' },
+          {
+            name: 'coveredConditions',
+            internalType: 'enum InsuranceInstitution.CoveredCondition[]',
+            type: 'uint8[]',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_userId', internalType: 'uint256', type: 'uint256' }],
+    name: 'getUserById',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct InsuranceInstitution.User',
+        type: 'tuple',
+        components: [
+          { name: 'id', internalType: 'uint256', type: 'uint256' },
+          { name: 'walletAddress', internalType: 'address', type: 'address' },
+          { name: 'coverageLimit', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'remainingCoverage',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          { name: 'isRegistered', internalType: 'bool', type: 'bool' },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     inputs: [
       {
         name: '_medicalInstitution',

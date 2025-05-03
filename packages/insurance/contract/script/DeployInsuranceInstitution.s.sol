@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import {Script, console} from "forge-std/Script.sol";
 import {InsuranceInstitution} from "../src/InsuranceInstitution.sol";
 
-contract InsuranceInstitutionScript is Script {
+contract DeployInsuranceInstitutionScript is Script {
     function run(address _usdcContractAddress) public {
         vm.startBroadcast();
 
