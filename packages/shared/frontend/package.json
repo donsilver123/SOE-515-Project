@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@soe511/frontend-shared",
+  "name": "@soe511/shared-frontend",
   "version": "1.0.0",
   "description": "",
   "exports": {

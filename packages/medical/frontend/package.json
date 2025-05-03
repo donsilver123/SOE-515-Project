@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/package.json",
-  "name": "@soe511/frontend-insurance",
+  "name": "@soe511/medical-frontend",
   "private": true,
   "type": "module",
   "scripts": {
