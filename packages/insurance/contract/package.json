@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@soe511/insurance-contract",
+  "exports": {
+    "./*": "./out/*"
+  }
+}

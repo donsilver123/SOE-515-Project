@@ -7,8 +7,16 @@ export const addressSchema = z
 	.refine((addr) => !!isAddress(addr), { message: "not a valid address" })
 	.transform((addr) => getAddress(addr));
 
+export const portSchema = z.coerce.number().min(0).max(65535);
+
 export const env = createEnv({
-	server: {},
+	server: {
+		INSURANCE_INSTITUTION_CONTRACT_ADDRESS: addressSchema,
+		INSURANCE_INSTITUTION_API_URL: z.string().url(),
+		INSURANCE_INSTITUTION_SERVER_PORT: portSchema,
+		DOMAIN: z.string(),
+		JWT_SECRET: z.string().min(32),
+	},
 
 	/**
 	 * The prefix that client-side variables must have. This is enforced both at
@@ -16,18 +24,13 @@ export const env = createEnv({
 	 */
 	clientPrefix: "VITE_",
 
-	client: {
-		VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS: addressSchema,
-		VITE_INSURANCE_INSTITUTION_NFT_CONTRACT_ADDRESS: addressSchema,
-		VITE_INSURANCE_INSTITUTION_API_URL: z.string().url(),
-		VITE_DOMAIN: z.string(),
-	},
+	client: {},
 
 	/**
 	 * What object holds the environment variables at runtime. This is usually
 	 * `process.env` or `import.meta.env`.
 	 */
-	runtimeEnv: import.meta.env,
+	runtimeEnv: process.env,
 
 	/**
 	 * By default, this library will feed the environment variables directly to

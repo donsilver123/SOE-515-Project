@@ -1,0 +1,356 @@
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// InsuranceInstitution
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const insuranceInstitutionAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      {
+        name: '_usdcContractAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_name', internalType: 'string', type: 'string' },
+      { name: '_coverageLimit', internalType: 'uint256', type: 'uint256' },
+      {
+        name: '_coveredConditions',
+        internalType: 'enum InsuranceInstitution.CoveredCondition[]',
+        type: 'uint8[]',
+      },
+    ],
+    name: 'addInsurancePlan',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: 'addressToMedicalInstitutionId',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: 'addressToUserId',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_medicalInstitution',
+        internalType: 'struct InsuranceInstitution.MedicalInstitution',
+        type: 'tuple',
+        components: [
+          { name: 'id', internalType: 'uint256', type: 'uint256' },
+          { name: 'contractAddress', internalType: 'address', type: 'address' },
+          { name: 'name', internalType: 'string', type: 'string' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'isRegistered', internalType: 'bool', type: 'bool' },
+        ],
+      },
+    ],
+    name: 'isMedicalInstitutionRegistered',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'pure',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_plan',
+        internalType: 'struct InsuranceInstitution.InsurancePlan',
+        type: 'tuple',
+        components: [
+          { name: 'id', internalType: 'uint256', type: 'uint256' },
+          { name: 'name', internalType: 'string', type: 'string' },
+          { name: 'coverageLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'isValid', internalType: 'bool', type: 'bool' },
+          {
+            name: 'coveredConditions',
+            internalType: 'enum InsuranceInstitution.CoveredCondition[]',
+            type: 'uint8[]',
+          },
+        ],
+      },
+    ],
+    name: 'isPlanValid',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'pure',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_user',
+        internalType: 'struct InsuranceInstitution.User',
+        type: 'tuple',
+        components: [
+          { name: 'id', internalType: 'uint256', type: 'uint256' },
+          { name: 'walletAddress', internalType: 'address', type: 'address' },
+          { name: 'coverageLimit', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'remainingCoverage',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          { name: 'isRegistered', internalType: 'bool', type: 'bool' },
+        ],
+      },
+    ],
+    name: 'isUserRegistered',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'pure',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    name: 'medicalInstitutions',
+    outputs: [
+      { name: 'id', internalType: 'uint256', type: 'uint256' },
+      { name: 'contractAddress', internalType: 'address', type: 'address' },
+      { name: 'name', internalType: 'string', type: 'string' },
+      { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+      { name: 'isRegistered', internalType: 'bool', type: 'bool' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    name: 'plans',
+    outputs: [
+      { name: 'id', internalType: 'uint256', type: 'uint256' },
+      { name: 'name', internalType: 'string', type: 'string' },
+      { name: 'coverageLimit', internalType: 'uint256', type: 'uint256' },
+      { name: 'isValid', internalType: 'bool', type: 'bool' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_signature', internalType: 'bytes', type: 'bytes' },
+      { name: '_userId', internalType: 'uint256', type: 'uint256' },
+      { name: '_claimAmount', internalType: 'uint256', type: 'uint256' },
+      { name: '_nonce', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'processClaim',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_contractAddress', internalType: 'address', type: 'address' },
+      { name: '_name', internalType: 'string', type: 'string' },
+    ],
+    name: 'registerMedicalInstitution',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'registerNewUser',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_planId', internalType: 'uint256', type: 'uint256' },
+      { name: '_isValid', internalType: 'bool', type: 'bool' },
+    ],
+    name: 'setPlanValidity',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_planId', internalType: 'uint256', type: 'uint256' }],
+    name: 'subscribeToPlan',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'usdcContractAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    name: 'users',
+    outputs: [
+      { name: 'id', internalType: 'uint256', type: 'uint256' },
+      { name: 'walletAddress', internalType: 'address', type: 'address' },
+      { name: 'coverageLimit', internalType: 'uint256', type: 'uint256' },
+      { name: 'remainingCoverage', internalType: 'uint256', type: 'uint256' },
+      { name: 'isRegistered', internalType: 'bool', type: 'bool' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'userId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'medicalInstitutionId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'ClaimProcessed',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'planId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      { name: 'name', internalType: 'string', type: 'string', indexed: false },
+      {
+        name: 'coverageLimit',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'InsurancePlanAdded',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'id', internalType: 'uint256', type: 'uint256', indexed: false },
+      {
+        name: 'contractAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      { name: 'name', internalType: 'string', type: 'string', indexed: false },
+    ],
+    name: 'MedicalInstitutionRegistered',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'userId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'walletAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    name: 'NewUserRegistered',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'planId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      { name: 'isValid', internalType: 'bool', type: 'bool', indexed: false },
+    ],
+    name: 'PlanValidityUpdated',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'userId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'walletAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'planId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'UserSubscribedToPlan',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'walletAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'AlreadySubscribedToPlan',
+  },
+  { type: 'error', inputs: [], name: 'InsufficientRemainingUserCcoverage' },
+  { type: 'error', inputs: [], name: 'InsufficientUserCoverage' },
+  {
+    type: 'error',
+    inputs: [{ name: 'planId', internalType: 'uint256', type: 'uint256' }],
+    name: 'InvalidPlanId',
+  },
+  { type: 'error', inputs: [], name: 'InvalidUserSignature' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'contractAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'MedicalInstitutionAlreadyRegistered',
+  },
+  { type: 'error', inputs: [], name: 'MedicalInstitutionNotAuthorizedByUser' },
+  { type: 'error', inputs: [], name: 'MedicalInstitutionNotRegistered' },
+  { type: 'error', inputs: [], name: 'USDCTransferFailed' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'walletAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'UserAlreadyRegistered',
+  },
+  { type: 'error', inputs: [], name: 'UserNotRegistered' },
+] as const
