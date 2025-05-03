@@ -1,7 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { insuranceInstitutionAbi } from "@soe511/shared-frontend/abi";
+import { env } from "@soe511/shared-frontend/env";
+import {
+	createFileRoute,
+	invariant,
+	useNavigate,
+} from "@tanstack/react-router";
 import { Loader2Icon } from "lucide-react";
-import { injected, useAccount, useConnect } from "wagmi";
+import { injected, useAccount, useConnect, useWalletClient } from "wagmi";
 
 export const Route = createFileRoute("/login")({
 	component: LoginPage,
@@ -9,8 +15,9 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
 	const { status: accountStatus, address } = useAccount();
-	const { connect, status: connectStatus } = useConnect();
+	const { connectAsync, status: connectStatus } = useConnect();
 	const navigate = useNavigate();
+	const { data: walletClient } = useWalletClient();
 
 	const isConnecting =
 		connectStatus === "pending" ||
@@ -23,6 +30,22 @@ function LoginPage() {
 
 	const isConnected = accountStatus === "connected";
 
+	const connectWallet = async () => {
+		await connectAsync({ connector: injected() });
+		invariant(walletClient);
+		invariant(walletClient.account);
+
+		await walletClient.writeContract({
+			address: env.VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS,
+			abi: insuranceInstitutionAbi,
+			functionName: "registerNewUser",
+		});
+
+		navigate({
+			to: "/dashboard",
+		});
+	};
+
 	if (isConnected)
 		navigate({
 			to: "/dashboard",
@@ -30,10 +53,7 @@ function LoginPage() {
 
 	return (
 		<div>
-			<Button
-				disabled={isConnecting}
-				onClick={() => connect({ connector: injected() })}
-			>
+			<Button disabled={isConnecting} onClick={connectWallet}>
 				{isConnecting ? (
 					<Loader2Icon className="size-4 animate-spin" />
 				) : (
