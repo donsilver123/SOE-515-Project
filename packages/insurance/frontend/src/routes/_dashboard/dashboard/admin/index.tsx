@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/select";
 import { env } from "@soe511/shared-frontend/env";
 import { createFileRoute } from "@tanstack/react-router";
-import { usePublicClient, useWriteContract } from "wagmi";
+import { usePublicClient, useWalletClient, useWriteContract } from "wagmi";
 import { insuranceInstitutionAbi } from "@soe511/shared-frontend/abi";
 import { SelectItem } from "@radix-ui/react-select";
 import { Button } from "@/components/ui/button";
@@ -16,8 +16,11 @@ import { Loader2Icon } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { WalletClient } from "viem";
 import { invariant } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
+	name: z.string(),
+	coverageLimit: z.coerce.bigint(),
 	coveredCondition: z.coerce.number().transform((v) => v.toString()),
 });
 
@@ -27,6 +30,7 @@ export const Route = createFileRoute("/_dashboard/dashboard/admin/")({
 
 function RouteComponent() {
 	const publicClient = usePublicClient();
+	const { data: walletClient } = useWalletClient();
 	const { mutate, status: addingInsurancePlanStatus } = useMutation({
 		mutationFn: async ({
 			name,
@@ -71,12 +75,23 @@ function RouteComponent() {
 
 	const form = useForm({
 		defaultValues: {
+			name: "",
+			coverageLimit: 0n,
 			coveredCondition: 0,
 		},
 		validators: {
 			onChange: formSchema,
 		},
-		onSubmit: () => {},
+		onSubmit: ({ value: { name, coverageLimit, coveredCondition } }) => {
+			invariant(walletClient, "ERR_WALLET_CLIENT");
+
+			mutate({
+				name,
+				coverageLimit,
+				coveredConditions: [coveredCondition],
+				walletClient,
+			});
+		},
 	});
 
 	if (status === "pending") return "Loading...";
@@ -86,14 +101,36 @@ function RouteComponent() {
 	return (
 		<div>
 			<form onSubmit={form.handleSubmit}>
+				<form.Field name="name">
+					{(field) => (
+						<Input
+							defaultValue={field.state.value.toString()}
+							onChange={(e) => field.handleChange(e.target.value)}
+							onBlur={field.handleBlur}
+							placeholder="Input plan name"
+						/>
+					)}
+				</form.Field>
+				<form.Field name="coverageLimit">
+					{(field) => (
+						<Input
+							defaultValue={field.state.value.toString()}
+							onChange={(e) => field.handleChange(BigInt(e.target.value))}
+							onBlur={field.handleBlur}
+							placeholder="Input coverage limit ($)"
+						/>
+					)}
+				</form.Field>
 				<form.Field name="coveredCondition">
 					{(field) => (
 						<Select
-						defaultValue={field.state.value.toString()}
-							onValueChange={(newValue) => Number.parseInt(newValue)}
+							defaultValue={field.state.value.toString()}
+							onValueChange={(newValue) =>
+								field.handleChange(Number.parseInt(newValue))
+							}
 						>
 							<SelectTrigger className="w-full">
-								<SelectValue placeholder="Select an insurance plan" />
+								<SelectValue placeholder="Select a coverage" />
 							</SelectTrigger>
 							<SelectContent>
 								{coveredConditions.map((condition, i) => (
