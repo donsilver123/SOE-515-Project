@@ -1,13 +1,25 @@
 import { Button } from "@/components/ui/button";
+import {
+	useCheckUserAccountRegistration,
+	useRegisterUserAccount,
+} from "@/lib/auth";
 import { insuranceInstitutionAbi } from "@soe511/shared-frontend/abi";
 import { env } from "@soe511/shared-frontend/env";
+import { useQuery } from "@tanstack/react-query";
 import {
 	createFileRoute,
 	invariant,
 	useNavigate,
 } from "@tanstack/react-router";
 import { Loader2Icon } from "lucide-react";
-import { injected, useAccount, useConnect, useWalletClient } from "wagmi";
+import {
+	injected,
+	useAccount,
+	useConnect,
+	usePublicClient,
+	useReadContract,
+	useWalletClient,
+} from "wagmi";
 
 export const Route = createFileRoute("/login")({
 	component: LoginPage,
@@ -18,48 +30,65 @@ function LoginPage() {
 	const { connectAsync, status: connectStatus } = useConnect();
 	const navigate = useNavigate();
 	const { data: walletClient } = useWalletClient();
+	const publicClient = usePublicClient();
+
+	const isConnected = connectStatus === "success";
 
 	const isConnecting =
 		connectStatus === "pending" ||
-		accountStatus === "connecting" ||
-		accountStatus === "reconnecting";
+		((accountStatus === "connecting" || accountStatus === "reconnecting") &&
+			!address);
 
-	console.log("connectStatus:", connectStatus);
-	console.log("accountStatus:", accountStatus, address);
-	console.log("isConnecting:", isConnecting);
+	const { data: isUserRegistered } = useCheckUserAccountRegistration({
+		publicClient,
+		walletClient,
+	});
 
-	const isConnected = accountStatus === "connected";
+	const { mutate: registerUserAccount, status: registerUserAccountStatus } =
+		useRegisterUserAccount({
+			onSuccess: () => {
+				navigate({
+					to: "/dashboard",
+				});
+			},
+		});
 
-	const connectWallet = async () => {
-		await connectAsync({ connector: injected() });
+	const isRegistering = registerUserAccountStatus === "pending";
+
+	const connectWallet = () => connectAsync({ connector: injected() });
+
+	const registerUser = () => {
 		invariant(walletClient);
 		invariant(walletClient.account);
 
-		await walletClient.writeContract({
-			address: env.VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS,
-			abi: insuranceInstitutionAbi,
-			functionName: "registerNewUser",
-		});
-
-		navigate({
-			to: "/dashboard",
-		});
+		registerUserAccount({ walletClient });
 	};
 
-	if (isConnected)
+	if (isUserRegistered)
 		navigate({
 			to: "/dashboard",
 		});
 
 	return (
 		<div>
-			<Button disabled={isConnecting} onClick={connectWallet}>
-				{isConnecting ? (
-					<Loader2Icon className="size-4 animate-spin" />
-				) : (
-					"Connect Wallet"
-				)}
-			</Button>
+			{!isConnected && (
+				<Button disabled={isConnecting} onClick={connectWallet}>
+					{isConnecting ? (
+						<Loader2Icon className="size-4 animate-spin" />
+					) : (
+						"Connect Wallet"
+					)}
+				</Button>
+			)}
+			{isConnected && (
+				<Button disabled={isRegistering} onClick={registerUser}>
+					{isRegistering ? (
+						<Loader2Icon className="size-4 animate-spin" />
+					) : (
+						"Register"
+					)}
+				</Button>
+			)}
 		</div>
 	);
 }

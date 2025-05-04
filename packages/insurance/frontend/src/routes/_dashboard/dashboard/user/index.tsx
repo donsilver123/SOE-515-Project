@@ -29,6 +29,8 @@ function RouteComponent() {
 		functionName: "getPlans",
 	});
 
+	console.log(plans)
+
 	const form = useForm({
 		defaultValues: {
 			planId: 0,

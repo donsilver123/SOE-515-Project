@@ -61,6 +61,30 @@ contract InsuranceInstitution is IInsuranceInstitution {
         OTHER
     }
 
+    string[] public coveredConditions = [
+        "REGULAR_CHECKUP",
+        "CONSULTATION",
+        "INFECTIOUS_DISEASES",
+        "RESPIRATORY_ILLNESS",
+        "CARDIOVASCULAR_DISEASES",
+        "GASTROINTESTINAL_DISORDERS",
+        "MUSCULOSKELETAL_CONDITIONS",
+        "MENTAL_HEALTH_SERVICES",
+        "MATERNITY_CARE",
+        "PEDIATRIC_CARE",
+        "EMERGENCY_CARE",
+        "SURGICAL_PROCEDURES",
+        "DIAGNOSTIC_TESTS",
+        "PRESCRIPTION_DRUGS",
+        "CANCER_TREATMENT",
+        "DIABETES_MANAGEMENT",
+        "ALLERGIES_AND_IMMUNOLOGY",
+        "REHABILITATION_SERVICES",
+        "VISION_CARE",
+        "DENTAL_CARE",
+        "OTHER"
+    ];
+
     struct InsurancePlan {
         uint id;
         string name;
@@ -77,12 +101,14 @@ contract InsuranceInstitution is IInsuranceInstitution {
         bool isRegistered;
     }
 
-    User[] public users;
+    mapping(uint => User) public users;
+    uint public nextUserId = 0;
     mapping(address => uint) public addressToUserId;
 
     InsurancePlan[] public plans;
 
-    MedicalInstitution[] public medicalInstitutions;
+    mapping(uint => MedicalInstitution) public medicalInstitutions;
+    uint public nextMedicalInstitutionId;
     mapping(address => uint) public addressToMedicalInstitutionId;
 
     mapping(uint => mapping(uint => uint)) userIdToAuthorizedMedicalInstitutionIdToNonce;
@@ -93,12 +119,18 @@ contract InsuranceInstitution is IInsuranceInstitution {
         usdcContractAddress = _usdcContractAddress;
     }
 
-    function getPlanById(uint _planId) public view returns (InsurancePlan memory) {
+    function getPlanById(
+        uint _planId
+    ) public view returns (InsurancePlan memory) {
         return plans[_planId];
     }
 
     function getPlans() public view returns (InsurancePlan[] memory) {
         return plans;
+    }
+
+    function getCoveredConditions() public view returns (string[] memory) {
+        return coveredConditions;
     }
 
     function getUserById(uint _userId) public view returns (User memory) {
@@ -127,11 +159,12 @@ contract InsuranceInstitution is IInsuranceInstitution {
             revert UserAlreadyRegistered(msg.sender);
         }
 
-        uint newUserId = users.length;
-        User storage newUser = users[newUserId];
-        newUser.id = newUserId;
+        uint _newUserId = nextUserId;
+        User storage newUser = users[_newUserId];
+        newUser.id = _newUserId;
         newUser.walletAddress = msg.sender;
         newUser.isRegistered = true;
+        nextUserId++;
 
         addressToUserId[msg.sender] = newUser.id;
 
@@ -190,7 +223,7 @@ contract InsuranceInstitution is IInsuranceInstitution {
             revert MedicalInstitutionAlreadyRegistered(_contractAddress);
         }
 
-        uint _medicalInstitutionId = medicalInstitutions.length;
+        uint _medicalInstitutionId = nextMedicalInstitutionId;
         MedicalInstitution storage _medicalInstitution = medicalInstitutions[
             _medicalInstitutionId
         ];
@@ -198,6 +231,7 @@ contract InsuranceInstitution is IInsuranceInstitution {
         _medicalInstitution.contractAddress = _contractAddress;
         _medicalInstitution.name = _name;
         _medicalInstitution.nonce = 0;
+        nextMedicalInstitutionId++;
 
         emit MedicalInstitutionRegistered(
             _medicalInstitution.id,

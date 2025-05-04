@@ -1,8 +1,4 @@
-import {
-	createFileRoute,
-	Outlet,
-	useNavigate,
-} from "@tanstack/react-router";
+import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import {
 	useAccount,
 	useConnect,
@@ -10,9 +6,12 @@ import {
 	useWalletClient,
 } from "wagmi";
 import { useQuery } from "@tanstack/react-query";
-import invariant from "tiny-invariant";
 import { env } from "@soe511/shared-frontend/env";
 import { insuranceInstitutionAbi } from "@soe511/shared-frontend/abi";
+import { accountStore } from "@/components/account";
+import { useEffect } from "react";
+import { invariant } from "@/lib/utils";
+import { checkUserAccountRegistration } from "@/lib/auth";
 
 export const Route = createFileRoute("/_dashboard")({
 	component: DashboardLayout,
@@ -25,49 +24,51 @@ function DashboardLayout() {
 	const { data: walletClient, status: walletClientStatus } = useWalletClient();
 	const navigate = useNavigate();
 
-	const isDisconnected =
-		accountStatus === "disconnected" ||
-		(accountStatus !== "connected" &&
-			(connectStatus === "idle" || connectStatus === "error"));
-
-	console.log(accountStatus);
-	console.log(connectStatus);
-	console.log(isDisconnected);
-	console.log(null);
+	const isDisconnected = accountStatus === "disconnected";
 
 	const { data: queryData, status: queryStatus } = useQuery({
 		queryKey: ["user", "account", "get"],
 		queryFn: async () => {
-			invariant(publicClient);
-			invariant(walletClient);
-			invariant(walletClient.account);
+			invariant(publicClient, "ERR_PUBLIC_CLIENT");
+			invariant(walletClient, "ERR_PUBLIC_CLIENT");
+			invariant(walletClient.account, "ERR_WALLET_CLIENT_ACCOUNT");
 
-			const userId = await publicClient.readContract({
-				address: env.VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS,
-				abi: insuranceInstitutionAbi,
-				functionName: "addressToUserId",
-				args: [walletClient.account.address],
+			const isRegistered = await checkUserAccountRegistration({
+				publicClient,
+				walletClient,
 			});
 
-			const user = await publicClient.readContract({
-				address: env.VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS,
-				abi: insuranceInstitutionAbi,
-				functionName: "getUserById",
-				args: [userId],
-			});
-
-			return user.isRegistered;
+			return isRegistered;
 		},
-		enabled: accountStatus === "connected",
+		enabled: !!publicClient && !!walletClient,
 	});
 
 	const shouldRedirectToLogin =
-		isDisconnected || (queryStatus === "success" && queryData !== true);
+		isDisconnected || (queryStatus !== "pending" && queryData !== true);
 
-	if (shouldRedirectToLogin)
-		navigate({
-			to: "/login",
-		});
+	useEffect(() => {
+		if (walletClient)
+			accountStore.setState((state) => ({
+				...state,
+				walletClient,
+			}));
+	}, [walletClient]);
+
+	useEffect(() => {
+		if (publicClient)
+			accountStore.setState((state) => ({
+				...state,
+				publicClient,
+			}));
+	}, [publicClient]);
+
+	useEffect(() => {
+		if (shouldRedirectToLogin) {
+			navigate({
+				to: "/login",
+			});
+		}
+	}, [navigate, shouldRedirectToLogin]);
 
 	return <Outlet />;
 }

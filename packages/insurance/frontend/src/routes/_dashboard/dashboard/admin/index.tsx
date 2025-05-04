@@ -1,9 +1,118 @@
-import { createFileRoute } from '@tanstack/react-router'
+import {
+	Select,
+	SelectContent,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { env } from "@soe511/shared-frontend/env";
+import { createFileRoute } from "@tanstack/react-router";
+import { usePublicClient, useWriteContract } from "wagmi";
+import { insuranceInstitutionAbi } from "@soe511/shared-frontend/abi";
+import { SelectItem } from "@radix-ui/react-select";
+import { Button } from "@/components/ui/button";
+import { z } from "zod";
+import { useForm } from "@tanstack/react-form";
+import { Loader2Icon } from "lucide-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import type { WalletClient } from "viem";
+import { invariant } from "@/lib/utils";
 
-export const Route = createFileRoute('/_dashboard/dashboard/admin/')({
-  component: RouteComponent,
-})
+const formSchema = z.object({
+	coveredCondition: z.coerce.number().transform((v) => v.toString()),
+});
+
+export const Route = createFileRoute("/_dashboard/dashboard/admin/")({
+	component: RouteComponent,
+});
 
 function RouteComponent() {
-  return <div>Hello "/dashboard/admin/"!</div>
+	const publicClient = usePublicClient();
+	const { mutate, status: addingInsurancePlanStatus } = useMutation({
+		mutationFn: async ({
+			name,
+			coverageLimit,
+			coveredConditions,
+			walletClient,
+		}: {
+			name: string;
+			coverageLimit: bigint;
+			coveredConditions: number[];
+			walletClient: WalletClient;
+		}) => {
+			invariant(walletClient.account, "ERR_WALLET_CLIENT_ACCOUNT");
+			invariant(walletClient.chain, "ERR_WALLET_CLIENT_CHAIN");
+
+			await walletClient.writeContract({
+				address: env.VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS,
+				abi: insuranceInstitutionAbi,
+				functionName: "addInsurancePlan",
+				args: [name, coverageLimit, coveredConditions],
+				chain: walletClient.chain,
+				account: walletClient.account,
+			});
+		},
+	});
+
+	const { data: coveredConditions, status } = useQuery({
+		queryKey: ["covered-conditions", "list"],
+		queryFn: async () => {
+			invariant(publicClient, "ERR_PUBLIC_CLIENT");
+
+			const conditions = await publicClient.readContract({
+				address: env.VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS,
+				abi: insuranceInstitutionAbi,
+				functionName: "getCoveredConditions",
+			});
+
+			return conditions;
+		},
+		enabled: !!publicClient,
+	});
+
+	const form = useForm({
+		defaultValues: {
+			coveredCondition: 0,
+		},
+		validators: {
+			onChange: formSchema,
+		},
+		onSubmit: () => {},
+	});
+
+	if (status === "pending") return "Loading...";
+
+	if (status === "error") return "Error occurred";
+
+	return (
+		<div>
+			<form onSubmit={form.handleSubmit}>
+				<form.Field name="coveredCondition">
+					{(field) => (
+						<Select
+						defaultValue={field.state.value.toString()}
+							onValueChange={(newValue) => Number.parseInt(newValue)}
+						>
+							<SelectTrigger className="w-full">
+								<SelectValue placeholder="Select an insurance plan" />
+							</SelectTrigger>
+							<SelectContent>
+								{coveredConditions.map((condition, i) => (
+									<SelectItem key={condition} value={i.toString()}>
+										{condition}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					)}
+				</form.Field>
+				<Button type="submit" disabled={form.state.isSubmitting}>
+					{form.state.isSubmitting ? (
+						<Loader2Icon className="size-4 animate-spin" />
+					) : (
+						"Add"
+					)}
+				</Button>
+			</form>
+		</div>
+	);
 }
