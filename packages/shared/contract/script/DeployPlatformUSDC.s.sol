@@ -2,13 +2,13 @@
 pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
-import {USDC} from "../src/USDC.sol";
+import {PlatformUSDC} from "../src/PlatformUSDC.sol";
 
-contract DeployUSDCScript is Script {
+contract DeployPlatformUSDCScript is Script {
     function run() public {
         vm.startBroadcast();
 
-        new USDC();
+        new PlatformUSDC();
 
         vm.stopBroadcast();
     }

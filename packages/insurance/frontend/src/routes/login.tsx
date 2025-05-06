@@ -3,9 +3,6 @@ import {
 	useCheckUserAccountRegistration,
 	useRegisterUserAccount,
 } from "@/lib/auth";
-import { insuranceInstitutionAbi } from "@soe511/shared-frontend/abi";
-import { env } from "@soe511/shared-frontend/env";
-import { useQuery } from "@tanstack/react-query";
 import {
 	createFileRoute,
 	invariant,

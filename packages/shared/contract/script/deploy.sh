@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 
 forge script \
-  ./script/USDC.s.sol:DeployUSDCScript \
+  ./script/DeployPlatformUSDC.s.sol:DeployPlatformUSDCScript \
   --broadcast \
   --rpc-url "$RPC_URL" \
   --private-key "$PRIVATE_KEY" \

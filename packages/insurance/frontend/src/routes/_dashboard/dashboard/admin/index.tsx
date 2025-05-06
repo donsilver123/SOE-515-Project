@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/select";
 import { env } from "@soe511/shared-frontend/env";
 import { createFileRoute } from "@tanstack/react-router";
-import { usePublicClient, useWalletClient, useWriteContract } from "wagmi";
+import { usePublicClient, useWalletClient } from "wagmi";
 import { insuranceInstitutionAbi } from "@soe511/shared-frontend/abi";
 import { SelectItem } from "@radix-ui/react-select";
 import { Button } from "@/components/ui/button";
@@ -25,10 +25,10 @@ const formSchema = z.object({
 });
 
 export const Route = createFileRoute("/_dashboard/dashboard/admin/")({
-	component: RouteComponent,
+	component: AdminDashboard,
 });
 
-function RouteComponent() {
+function AdminDashboard() {
 	const publicClient = usePublicClient();
 	const { data: walletClient } = useWalletClient();
 	const { mutate, status: addingInsurancePlanStatus } = useMutation({
@@ -103,7 +103,7 @@ function RouteComponent() {
 			<form onSubmit={form.handleSubmit}>
 				<form.Field name="name">
 					{(field) => (
-						<Input
+						<input
 							defaultValue={field.state.value.toString()}
 							onChange={(e) => field.handleChange(e.target.value)}
 							onBlur={field.handleBlur}
@@ -113,7 +113,7 @@ function RouteComponent() {
 				</form.Field>
 				<form.Field name="coverageLimit">
 					{(field) => (
-						<Input
+						<input
 							defaultValue={field.state.value.toString()}
 							onChange={(e) => field.handleChange(BigInt(e.target.value))}
 							onBlur={field.handleBlur}
@@ -123,23 +123,18 @@ function RouteComponent() {
 				</form.Field>
 				<form.Field name="coveredCondition">
 					{(field) => (
-						<Select
+						<select
 							defaultValue={field.state.value.toString()}
-							onValueChange={(newValue) =>
-								field.handleChange(Number.parseInt(newValue))
+							onChange={(e) =>
+								field.handleChange(Number.parseInt(e.target.value))
 							}
 						>
-							<SelectTrigger className="w-full">
-								<SelectValue placeholder="Select a coverage" />
-							</SelectTrigger>
-							<SelectContent>
-								{coveredConditions.map((condition, i) => (
-									<SelectItem key={condition} value={i.toString()}>
-										{condition}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+							{coveredConditions.map((condition, i) => (
+								<option key={condition} value={i.toString()}>
+									{condition}
+								</option>
+							))}
+						</select>
 					)}
 				</form.Field>
 				<Button type="submit" disabled={form.state.isSubmitting}>

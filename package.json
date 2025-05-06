@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "pnpm --recursive --parallel dev",
     "typegen": "pnpm --recursive --parallel typegen",
-    "deploy": "pnpm --filter @soe511/shared-contract run deploy && pnpm --filter @soe511/insurance-contract run deploy"
+    "deploy": "pnpm --recursive --parallel run deploy",
+    "setup": "pnpm --recursive --parallel run setup"
   }
 }

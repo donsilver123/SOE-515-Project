@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import {ERC20} from "solady/tokens/ERC20.sol";
 
-contract USDC is ERC20 {
+contract PlatformUSDC is ERC20 {
     function mint(address _recipient, uint256 _amount) external {
         _mint(_recipient, _amount);
     }
@@ -13,14 +13,14 @@ contract USDC is ERC20 {
     }
 
     function name() public view virtual override returns (string memory) {
-        return "USDC";
+        return "PlatformUSDC";
     }
 
     function symbol() public view virtual override returns (string memory) {
-        return "USDC";
+        return "PUSDC";
     }
 
     function decimals() public view virtual override returns (uint8) {
-        return 6;
+        return 2;
     }
 }

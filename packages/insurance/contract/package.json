@@ -2,7 +2,8 @@
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@soe511/insurance-contract",
   "scripts": {
-    "deploy": "./script/deploy.sh"
+    "deploy": "./script/deploy.sh",
+    "setup": "./script/setup.sh"
   },
   "exports": {
     "./*": "./out/*"

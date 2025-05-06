@@ -1,5 +1,5 @@
 import { http, createConfig } from "wagmi";
-import { metaMask } from "wagmi/connectors";
+import { injected } from "wagmi/connectors";
 import { anvil } from "wagmi/chains";
 
 export const config = createConfig({
@@ -7,5 +7,5 @@ export const config = createConfig({
 	transports: {
 		[anvil.id]: http(),
 	},
-	connectors: [metaMask()],
+	connectors: [injected()],
 });

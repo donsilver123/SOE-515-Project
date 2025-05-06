@@ -1,14 +1,7 @@
-import {
-	Select,
-	SelectContent,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { env } from "@soe511/shared-frontend/env";
 import { createFileRoute } from "@tanstack/react-router";
 import { useReadContract } from "wagmi";
 import { insuranceInstitutionAbi } from "@soe511/shared-frontend/abi";
-import { SelectItem } from "@radix-ui/react-select";
 import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
@@ -29,8 +22,6 @@ function RouteComponent() {
 		functionName: "getPlans",
 	});
 
-	console.log(plans)
-
 	const form = useForm({
 		defaultValues: {
 			planId: 0,
@@ -50,21 +41,16 @@ function RouteComponent() {
 			<form onSubmit={form.handleSubmit}>
 				<form.Field name="planId">
 					{(field) => (
-						<Select
-							value={field.state.value.toString()}
-							onValueChange={(newValue) => Number.parseInt(newValue)}
+						<select
+							onChange={(e) => field.setValue(Number.parseInt(e.target.value))}
+							defaultValue={field.state.value.toString()}
 						>
-							<SelectTrigger className="w-full">
-								<SelectValue placeholder="Select an insurance plan" />
-							</SelectTrigger>
-							<SelectContent>
-								{plans.map((plan) => (
-									<SelectItem key={plan.id} value={plan.id.toString()}>
-										{plan.name}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+							{plans.map((plan) => (
+								<option key={plan.id} value={plan.id.toString()}>
+									{plan.name}
+								</option>
+							))}
+						</select>
 					)}
 				</form.Field>
 				<Button type="submit" disabled={form.state.isSubmitting}>
