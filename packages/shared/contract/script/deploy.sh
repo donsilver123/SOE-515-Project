@@ -7,4 +7,5 @@ forge script \
   --private-key "$PRIVATE_KEY" \
   --sig "run()" \
   --retries "$RETRY_COUNT" \
+  --force \
   -vvvv
