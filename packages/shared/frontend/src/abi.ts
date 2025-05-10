@@ -45,6 +45,15 @@ export const insuranceInstitutionAbi = [
   },
   {
     type: 'function',
+    inputs: [
+      { name: '_userAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'checkUserRegistration',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     name: 'coveredConditions',
     outputs: [{ name: '', internalType: 'string', type: 'string' }],

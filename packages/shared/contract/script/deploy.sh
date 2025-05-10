@@ -1,5 +1,7 @@
 #! /usr/bin/env bash
 
+forge clean
+
 forge script \
   ./script/DeployPlatformUSDC.s.sol:DeployPlatformUSDCScript \
   --broadcast \
@@ -7,5 +9,4 @@ forge script \
   --private-key "$PRIVATE_KEY" \
   --sig "run()" \
   --retries "$RETRY_COUNT" \
-  --force \
   -vvvv

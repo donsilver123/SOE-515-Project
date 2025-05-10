@@ -15,21 +15,14 @@ export const checkUserAccountRegistration = async ({
 	invariant(walletClient.account, "ERR_WALLET_CLIENT_ACCOUNT");
 
 	try {
-		const userId = await publicClient.readContract({
+		const isUserRegistered = await publicClient.readContract({
 			address: env.VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS,
 			abi: insuranceInstitutionAbi,
-			functionName: "addressToUserId",
+			functionName: "checkUserRegistration",
 			args: [walletClient.account.address],
 		});
 
-		const user = await publicClient.readContract({
-			address: env.VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS,
-			abi: insuranceInstitutionAbi,
-			functionName: "getUserById",
-			args: [userId],
-		});
-
-		return user.isRegistered;
+		return isUserRegistered;
 	} catch (err) {
 		console.log(err);
 		return false;

@@ -29,8 +29,10 @@ function RouteComponent() {
 		validators: {
 			onChange: formSchema,
 		},
-		onSubmit: () => {},
+		onSubmit: () => { },
 	});
+
+	console.log(plans);
 
 	if (status === "pending") return "Loading...";
 

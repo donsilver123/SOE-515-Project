@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.0;
 
+import {console} from "forge-std/console.sol";
 import {ECDSA} from "solady/utils/ECDSA.sol";
 import {ERC20} from "solady/tokens/ERC20.sol";
 import {IInsuranceInstitution} from "./IInsuranceInstitution.sol";
 
 contract InsuranceInstitution is IInsuranceInstitution {
     error UserAlreadyRegistered(address walletAddress);
-    error InvalidPlanId(uint planId);
+    error InvalidPlan();
     error UserNotRegistered();
     error AlreadySubscribedToPlan(address walletAddress);
     error MedicalInstitutionAlreadyRegistered(address contractAddress);
@@ -105,7 +106,8 @@ contract InsuranceInstitution is IInsuranceInstitution {
     uint public nextUserId = 0;
     mapping(address => uint) public addressToUserId;
 
-    InsurancePlan[] public plans;
+    uint nextPlanId = 0;
+    mapping(uint => InsurancePlan) public plans;
 
     mapping(uint => MedicalInstitution) public medicalInstitutions;
     uint public nextMedicalInstitutionId;
@@ -126,7 +128,11 @@ contract InsuranceInstitution is IInsuranceInstitution {
     }
 
     function getPlans() public view returns (InsurancePlan[] memory) {
-        return plans;
+        InsurancePlan[] memory _plans = new InsurancePlan[](nextPlanId);
+        for (uint i = 0; i < nextPlanId; i++) {
+            _plans[i] = plans[i];
+        }
+        return _plans;
     }
 
     function getCoveredConditions() public view returns (string[] memory) {
@@ -141,6 +147,12 @@ contract InsuranceInstitution is IInsuranceInstitution {
         InsurancePlan memory _plan
     ) public pure returns (bool) {
         return _plan.isValid;
+    }
+
+    function checkUserRegistration(
+        address _userAddress
+    ) public view returns (bool) {
+        return isUserRegistered(users[addressToUserId[_userAddress]]);
     }
 
     function isUserRegistered(User memory _user) public pure returns (bool) {
@@ -176,8 +188,10 @@ contract InsuranceInstitution is IInsuranceInstitution {
         if (!isUserRegistered(_user)) {
             revert UserNotRegistered();
         }
-        if (_planId >= plans.length || _planId < 0) {
-            revert InvalidPlanId(_planId);
+
+        InsurancePlan storage _plan = plans[_planId];
+        if (!isPlanValid(_plan)) {
+            revert InvalidPlan();
         }
 
         uint _newCoverageLimit = plans[_planId].coverageLimit;
@@ -192,21 +206,22 @@ contract InsuranceInstitution is IInsuranceInstitution {
         uint _coverageLimit,
         CoveredCondition[] calldata _coveredConditions
     ) public {
-        uint _newPlanId = plans.length;
-        InsurancePlan storage _newPlan = plans[_newPlanId];
-        _newPlan.id = plans.length;
+        InsurancePlan storage _newPlan = plans[nextPlanId];
+        _newPlan.id = nextPlanId;
         _newPlan.name = _name;
         _newPlan.coverageLimit = _coverageLimit;
         _newPlan.isValid = true;
         _newPlan.coveredConditions = _coveredConditions;
 
+        nextPlanId++;
+
         emit InsurancePlanAdded(_newPlan.id, _name, _coverageLimit);
     }
 
     function setPlanValidity(uint _planId, bool _isValid) public {
-        if (_planId >= plans.length) revert InvalidPlanId(_planId);
+        InsurancePlan storage _plan = plans[_planId];
 
-        plans[_planId].isValid = _isValid;
+        _plan.isValid = _isValid;
 
         emit PlanValidityUpdated(_planId, _isValid);
     }

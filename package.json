@@ -3,6 +3,7 @@
   "name": "soe511",
   "scripts": {
     "dev": "pnpm --recursive --parallel dev",
+    "build": "pnpm --recursive --parallel build",
     "typegen": "pnpm --recursive --parallel typegen",
     "deploy": "pnpm --recursive --parallel run deploy",
     "setup": "pnpm --recursive --parallel run setup"

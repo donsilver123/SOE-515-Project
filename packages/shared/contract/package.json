@@ -3,7 +3,8 @@
   "name": "@soe511/shared-contract",
   "scripts": {
     "deploy": "./script/deploy.sh",
-    "setup": "./script/setup.sh"
+    "setup": "./script/setup.sh",
+    "build": "forge build"
   },
   "exports": {
     "./*": "./out/*"
