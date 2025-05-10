@@ -1,11 +1,6 @@
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
-import { isAddress, getAddress } from "viem";
-
-export const addressSchema = z
-	.string()
-	.refine((addr) => !!isAddress(addr), { message: "not a valid address" })
-	.transform((addr) => getAddress(addr));
+import { Address } from "abitype/zod";
 
 export const env = createEnv({
 	server: {},
@@ -17,8 +12,10 @@ export const env = createEnv({
 	clientPrefix: "VITE_",
 
 	client: {
-		VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS: addressSchema,
-		VITE_INSURANCE_INSTITUTION_NFT_CONTRACT_ADDRESS: addressSchema,
+		VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS: Address,
+		VITE_INSURANCE_INSTITUTION_NFT_CONTRACT_ADDRESS: Address,
+		VITE_USDC_CONTRACT_ADDRESS: Address,
+		VITE_PERMIT2_CONTRACT_ADDRESS: Address,
 		VITE_INSURANCE_INSTITUTION_API_URL: z.string().url(),
 		VITE_DOMAIN: z.string(),
 	},

@@ -7,6 +7,11 @@ export const insuranceInstitutionAbi = [
     type: 'constructor',
     inputs: [
       {
+        name: '_permit2ContractAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+      {
         name: '_usdcContractAddress',
         internalType: 'address',
         type: 'address',
@@ -19,6 +24,7 @@ export const insuranceInstitutionAbi = [
     inputs: [
       { name: '_name', internalType: 'string', type: 'string' },
       { name: '_coverageLimit', internalType: 'uint256', type: 'uint256' },
+      { name: '_price', internalType: 'uint256', type: 'uint256' },
       {
         name: '_coveredConditions',
         internalType: 'enum InsuranceInstitution.CoveredCondition[]',
@@ -80,6 +86,7 @@ export const insuranceInstitutionAbi = [
           { name: 'name', internalType: 'string', type: 'string' },
           { name: 'coverageLimit', internalType: 'uint256', type: 'uint256' },
           { name: 'isValid', internalType: 'bool', type: 'bool' },
+          { name: 'price', internalType: 'uint256', type: 'uint256' },
           {
             name: 'coveredConditions',
             internalType: 'enum InsuranceInstitution.CoveredCondition[]',
@@ -104,6 +111,7 @@ export const insuranceInstitutionAbi = [
           { name: 'name', internalType: 'string', type: 'string' },
           { name: 'coverageLimit', internalType: 'uint256', type: 'uint256' },
           { name: 'isValid', internalType: 'bool', type: 'bool' },
+          { name: 'price', internalType: 'uint256', type: 'uint256' },
           {
             name: 'coveredConditions',
             internalType: 'enum InsuranceInstitution.CoveredCondition[]',
@@ -170,6 +178,7 @@ export const insuranceInstitutionAbi = [
           { name: 'name', internalType: 'string', type: 'string' },
           { name: 'coverageLimit', internalType: 'uint256', type: 'uint256' },
           { name: 'isValid', internalType: 'bool', type: 'bool' },
+          { name: 'price', internalType: 'uint256', type: 'uint256' },
           {
             name: 'coveredConditions',
             internalType: 'enum InsuranceInstitution.CoveredCondition[]',
@@ -235,6 +244,43 @@ export const insuranceInstitutionAbi = [
   },
   {
     type: 'function',
+    inputs: [],
+    name: 'permit2ContractAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_permit',
+        internalType: 'struct IAllowanceTransfer.PermitSingle',
+        type: 'tuple',
+        components: [
+          {
+            name: 'details',
+            internalType: 'struct IAllowanceTransfer.PermitDetails',
+            type: 'tuple',
+            components: [
+              { name: 'token', internalType: 'address', type: 'address' },
+              { name: 'amount', internalType: 'uint160', type: 'uint160' },
+              { name: 'expiration', internalType: 'uint48', type: 'uint48' },
+              { name: 'nonce', internalType: 'uint48', type: 'uint48' },
+            ],
+          },
+          { name: 'spender', internalType: 'address', type: 'address' },
+          { name: 'sigDeadline', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+      { name: '_signature', internalType: 'bytes', type: 'bytes' },
+      { name: '_planId', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'permitAndPurchasePlan',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     name: 'plans',
     outputs: [
@@ -242,6 +288,7 @@ export const insuranceInstitutionAbi = [
       { name: 'name', internalType: 'string', type: 'string' },
       { name: 'coverageLimit', internalType: 'uint256', type: 'uint256' },
       { name: 'isValid', internalType: 'bool', type: 'bool' },
+      { name: 'price', internalType: 'uint256', type: 'uint256' },
     ],
     stateMutability: 'view',
   },
@@ -254,6 +301,13 @@ export const insuranceInstitutionAbi = [
       { name: '_nonce', internalType: 'uint256', type: 'uint256' },
     ],
     name: 'processClaim',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_planId', internalType: 'uint256', type: 'uint256' }],
+    name: 'purchasePlan',
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -400,6 +454,25 @@ export const insuranceInstitutionAbi = [
         type: 'uint256',
         indexed: false,
       },
+      {
+        name: 'userId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'PlanPurchased',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'planId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
       { name: 'isValid', internalType: 'bool', type: 'bool', indexed: false },
     ],
     name: 'PlanValidityUpdated',
@@ -438,11 +511,7 @@ export const insuranceInstitutionAbi = [
   },
   { type: 'error', inputs: [], name: 'InsufficientRemainingUserCcoverage' },
   { type: 'error', inputs: [], name: 'InsufficientUserCoverage' },
-  {
-    type: 'error',
-    inputs: [{ name: 'planId', internalType: 'uint256', type: 'uint256' }],
-    name: 'InvalidPlanId',
-  },
+  { type: 'error', inputs: [], name: 'InvalidPlan' },
   { type: 'error', inputs: [], name: 'InvalidUserSignature' },
   {
     type: 'error',

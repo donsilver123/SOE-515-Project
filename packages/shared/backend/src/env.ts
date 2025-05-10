@@ -1,17 +1,12 @@
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
-import { isAddress, getAddress } from "viem";
-
-export const addressSchema = z
-	.string()
-	.refine((addr) => !!isAddress(addr), { message: "not a valid address" })
-	.transform((addr) => getAddress(addr));
+import { Address } from "abitype/zod";
 
 export const portSchema = z.coerce.number().min(0).max(65535);
 
 export const env = createEnv({
 	server: {
-		INSURANCE_INSTITUTION_CONTRACT_ADDRESS: addressSchema,
+		INSURANCE_INSTITUTION_CONTRACT_ADDRESS: Address,
 		INSURANCE_INSTITUTION_API_URL: z.string().url(),
 		INSURANCE_INSTITUTION_SERVER_PORT: portSchema,
 		DOMAIN: z.string(),

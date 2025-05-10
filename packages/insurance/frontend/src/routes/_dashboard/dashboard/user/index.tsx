@@ -1,6 +1,6 @@
 import { env } from "@soe511/shared-frontend/env";
 import { createFileRoute } from "@tanstack/react-router";
-import { useReadContract } from "wagmi";
+import { usePublicClient, useReadContract, useWalletClient } from "wagmi";
 import { insuranceInstitutionAbi } from "@soe511/shared-frontend/abi";
 import { Button } from "@/components/ui/button";
 import { z } from "zod";
@@ -8,16 +8,21 @@ import { useForm, useStore } from "@tanstack/react-form";
 import { Loader2Icon } from "lucide-react";
 import { PlanPricing } from "./-components/plan-pricing";
 import { purchasePlan } from "./-components/actions";
+import type { FunctionComponent } from "react";
+import type { PublicClient, WalletClient } from "viem";
 
 const formSchema = z.object({
 	planId: z.number(),
 });
 
 export const Route = createFileRoute("/_dashboard/dashboard/user/")({
-	component: RouteComponent,
+	component: UserDashboardPage,
 });
 
-function RouteComponent() {
+const UserDashboardForm: FunctionComponent<{
+	walletClient: WalletClient;
+	publicClient: PublicClient;
+}> = ({ walletClient, publicClient }) => {
 	const { data: plans, status } = useReadContract({
 		address: env.VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS,
 		abi: insuranceInstitutionAbi,
@@ -31,7 +36,9 @@ function RouteComponent() {
 		validators: {
 			onChange: formSchema,
 		},
-		onSubmit: ({ value: { planId } }) => purchasePlan(planId),
+		onSubmit: ({ value: { planId } }) => {
+			purchasePlan({ planId, publicClient, walletClient });
+		},
 	});
 
 	const { planId } = useStore(form.store, (state) => state.values);
@@ -78,5 +85,19 @@ function RouteComponent() {
 				</div>
 			</form>
 		</div>
+	);
+};
+
+function UserDashboardPage() {
+	const { data: walletClient, status: statusWalletClient } = useWalletClient();
+	const publicClient = usePublicClient();
+
+	if (statusWalletClient !== "success" || !publicClient) return "Loading...";
+
+	return (
+		<UserDashboardForm
+			publicClient={publicClient}
+			walletClient={walletClient}
+		/>
 	);
 }

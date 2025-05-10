@@ -1,6 +1,6 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
-import { addressSchema, env } from "@soe511/shared-backend/env";
+import { env } from "@soe511/shared-backend/env";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { createSiweMessage } from "viem/siwe";
@@ -8,6 +8,7 @@ import { sepolia } from "viem/chains";
 import { publicClient } from "./lib/web3";
 import type { Hex } from "viem";
 import { SignJWT } from "jose";
+import { Address } from "abitype/zod";
 
 const jwtSecret = new TextEncoder().encode(env.JWT_SECRET);
 
@@ -20,7 +21,7 @@ const app = new Hono().post(
         .string()
         .startsWith("0x")
         .transform((s) => s as Hex),
-      address: addressSchema,
+      address: Address,
     }),
   ),
   async (c) => {
@@ -55,7 +56,7 @@ const app = new Hono().post(
   },
 );
 
-export type App = typeof app
+export type App = typeof app;
 
 serve(
   {
