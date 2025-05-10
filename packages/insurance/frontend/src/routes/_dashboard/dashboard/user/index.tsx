@@ -4,8 +4,10 @@ import { useReadContract } from "wagmi";
 import { insuranceInstitutionAbi } from "@soe511/shared-frontend/abi";
 import { Button } from "@/components/ui/button";
 import { z } from "zod";
-import { useForm } from "@tanstack/react-form";
+import { useForm, useStore } from "@tanstack/react-form";
 import { Loader2Icon } from "lucide-react";
+import { PlanPricing } from "./-components/plan-pricing";
+import { purchasePlan } from "./-components/actions";
 
 const formSchema = z.object({
 	planId: z.number(),
@@ -29,10 +31,10 @@ function RouteComponent() {
 		validators: {
 			onChange: formSchema,
 		},
-		onSubmit: () => { },
+		onSubmit: ({ value: { planId } }) => purchasePlan(planId),
 	});
 
-	console.log(plans);
+	const { planId } = useStore(form.store, (state) => state.values);
 
 	if (status === "pending") return "Loading...";
 
@@ -40,28 +42,40 @@ function RouteComponent() {
 
 	return (
 		<div>
-			<form onSubmit={form.handleSubmit}>
-				<form.Field name="planId">
-					{(field) => (
-						<select
-							onChange={(e) => field.setValue(Number.parseInt(e.target.value))}
-							defaultValue={field.state.value.toString()}
-						>
-							{plans.map((plan) => (
-								<option key={plan.id} value={plan.id.toString()}>
-									{plan.name}
-								</option>
-							))}
-						</select>
-					)}
-				</form.Field>
-				<Button type="submit" disabled={form.state.isSubmitting}>
-					{form.state.isSubmitting ? (
-						<Loader2Icon className="size-4 animate-spin" />
-					) : (
-						"Purchase"
-					)}
-				</Button>
+			<form
+				onSubmit={(e) => {
+					e.preventDefault();
+					form.handleSubmit();
+				}}
+			>
+				<div>
+					<form.Field name="planId">
+						{(field) => (
+							<select
+								onChange={(e) =>
+									field.setValue(Number.parseInt(e.target.value))
+								}
+								defaultValue={field.state.value.toString()}
+							>
+								{plans.map((plan) => (
+									<option key={plan.id} value={plan.id.toString()}>
+										{plan.name}
+									</option>
+								))}
+							</select>
+						)}
+					</form.Field>
+				</div>
+				{plans && <PlanPricing plan={plans[planId]} />}
+				<div>
+					<Button type="submit" disabled={form.state.isSubmitting}>
+						{form.state.isSubmitting ? (
+							<Loader2Icon className="size-4 animate-spin" />
+						) : (
+							"Purchase"
+						)}
+					</Button>
+				</div>
 			</form>
 		</div>
 	);

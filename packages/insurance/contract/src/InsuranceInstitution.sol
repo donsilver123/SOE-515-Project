@@ -5,6 +5,7 @@ import {console} from "forge-std/console.sol";
 import {ECDSA} from "solady/utils/ECDSA.sol";
 import {ERC20} from "solady/tokens/ERC20.sol";
 import {IInsuranceInstitution} from "./IInsuranceInstitution.sol";
+import {IPermit2} from "permit2/interfaces/IPermit2.sol";
 
 contract InsuranceInstitution is IInsuranceInstitution {
     error UserAlreadyRegistered(address walletAddress);
@@ -29,6 +30,7 @@ contract InsuranceInstitution is IInsuranceInstitution {
     );
     event PlanValidityUpdated(uint planId, bool isValid);
     event ClaimProcessed(uint userId, uint medicalInstitutionId, uint amount);
+    event PlanPurchased(uint planId, uint userId);
 
     struct User {
         uint id;
@@ -91,6 +93,7 @@ contract InsuranceInstitution is IInsuranceInstitution {
         string name;
         uint coverageLimit;
         bool isValid;
+        uint price;
         CoveredCondition[] coveredConditions;
     }
 
@@ -115,9 +118,11 @@ contract InsuranceInstitution is IInsuranceInstitution {
 
     mapping(uint => mapping(uint => uint)) userIdToAuthorizedMedicalInstitutionIdToNonce;
 
+    address public immutable permit2ContractAddress;
     address public immutable usdcContractAddress;
 
-    constructor(address _usdcContractAddress) {
+    constructor(address _permit2ContractAddress, address _usdcContractAddress) {
+        permit2ContractAddress = _permit2ContractAddress;
         usdcContractAddress = _usdcContractAddress;
     }
 
@@ -183,6 +188,38 @@ contract InsuranceInstitution is IInsuranceInstitution {
         emit NewUserRegistered(newUser.id, msg.sender);
     }
 
+    function purchasePlan(uint _planId) public {
+        InsurancePlan storage _plan = plans[_planId];
+        if (!isPlanValid(_plan)) revert InvalidPlan();
+
+        uint _userId = addressToUserId[msg.sender];
+        User storage _user = users[_userId];
+        if (!isUserRegistered(_user)) revert UserNotRegistered();
+
+        IPermit2 permit2 = IPermit2(permit2ContractAddress);
+        permit2.transferFrom(
+            msg.sender,
+            address(this),
+            uint160(_plan.price),
+            usdcContractAddress
+        );
+
+        _user.remainingCoverage += _plan.coverageLimit;
+
+        emit PlanPurchased(_planId, _userId);
+    }
+
+    function permitAndPurchasePlan(
+        IPermit2.PermitSingle calldata _permit,
+        bytes calldata _signature,
+        uint _planId
+    ) public {
+        IPermit2 permit2 = IPermit2(permit2ContractAddress);
+        permit2.permit(msg.sender, _permit, _signature);
+
+        purchasePlan(_planId);
+    }
+
     function subscribeToPlan(uint _planId) public {
         User storage _user = users[addressToUserId[msg.sender]];
         if (!isUserRegistered(_user)) {
@@ -204,12 +241,14 @@ contract InsuranceInstitution is IInsuranceInstitution {
     function addInsurancePlan(
         string memory _name,
         uint _coverageLimit,
+        uint _price,
         CoveredCondition[] calldata _coveredConditions
     ) public {
         InsurancePlan storage _newPlan = plans[nextPlanId];
         _newPlan.id = nextPlanId;
         _newPlan.name = _name;
         _newPlan.coverageLimit = _coverageLimit;
+        _newPlan.price = _price;
         _newPlan.isValid = true;
         _newPlan.coveredConditions = _coveredConditions;
 
