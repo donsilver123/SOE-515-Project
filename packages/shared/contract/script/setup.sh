@@ -4,4 +4,4 @@ cast send \
   --private-key "$PRIVATE_KEY" \
   --rpc-url "$RPC_URL" \
   "$USDC_CONTRACT_ADDRESS" \
-  "mint(uint)" 10000
+  "mint(uint)" 100000000

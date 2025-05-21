@@ -10,6 +10,8 @@ import { PlanPricing } from "./-components/plan-pricing";
 import { purchasePlan } from "./-components/actions";
 import type { FunctionComponent } from "react";
 import type { PublicClient, WalletClient } from "viem";
+import type { Plan } from "@/lib/types";
+import { toast } from "sonner";
 
 const formSchema = z.object({
 	planId: z.number(),
@@ -20,15 +22,10 @@ export const Route = createFileRoute("/_dashboard/dashboard/user/")({
 });
 
 const UserDashboardForm: FunctionComponent<{
+	plans: readonly Plan[];
 	walletClient: WalletClient;
 	publicClient: PublicClient;
-}> = ({ walletClient, publicClient }) => {
-	const { data: plans, status } = useReadContract({
-		address: env.VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS,
-		abi: insuranceInstitutionAbi,
-		functionName: "getPlans",
-	});
-
+}> = ({ plans, walletClient, publicClient }) => {
 	const form = useForm({
 		defaultValues: {
 			planId: 0,
@@ -36,16 +33,23 @@ const UserDashboardForm: FunctionComponent<{
 		validators: {
 			onChange: formSchema,
 		},
-		onSubmit: ({ value: { planId } }) => {
-			purchasePlan({ planId, publicClient, walletClient });
+		onSubmit: async ({ value: { planId } }) => {
+			const res = await purchasePlan({
+				plan: plans[planId],
+				publicClient,
+				walletClient,
+			});
+
+			if (res.isErr) {
+				toast.warning("Sorry an error occurred!");
+				return;
+			}
+
+			toast.success("Insurance plan successfully purchased!");
 		},
 	});
 
 	const { planId } = useStore(form.store, (state) => state.values);
-
-	if (status === "pending") return "Loading...";
-
-	if (status === "error") return "Error occurred";
 
 	return (
 		<div>
@@ -91,13 +95,24 @@ const UserDashboardForm: FunctionComponent<{
 function UserDashboardPage() {
 	const { data: walletClient, status: statusWalletClient } = useWalletClient();
 	const publicClient = usePublicClient();
+	const { data: plans, status: plansStatus } = useReadContract({
+		address: env.VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS,
+		abi: insuranceInstitutionAbi,
+		functionName: "getPlans",
+	});
 
-	if (statusWalletClient !== "success" || !publicClient) return "Loading...";
+	if (
+		statusWalletClient !== "success" ||
+		!publicClient ||
+		plansStatus !== "success"
+	)
+		return "Loading...";
 
 	return (
 		<UserDashboardForm
 			publicClient={publicClient}
 			walletClient={walletClient}
+			plans={plans}
 		/>
 	);
 }

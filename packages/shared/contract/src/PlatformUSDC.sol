@@ -12,15 +12,15 @@ contract PlatformUSDC is ERC20 {
         _mint(msg.sender, _amount);
     }
 
-    function name() public view virtual override returns (string memory) {
+    function name() public pure override returns (string memory) {
         return "PlatformUSDC";
     }
 
-    function symbol() public view virtual override returns (string memory) {
+    function symbol() public pure override returns (string memory) {
         return "PUSDC";
     }
 
-    function decimals() public view virtual override returns (uint8) {
+    function decimals() public pure override returns (uint8) {
         return 2;
     }
 }

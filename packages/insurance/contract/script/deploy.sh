@@ -1,21 +1,14 @@
 #! /usr/bin/env bash
 
-forge clean
+# forge clean
 
 forge script \
-  ./script/DeployStaffNFT.s.sol:DeployStaffNFTScript \
+  ./script/DeployInsuranceInstitution.s.sol:DeployInsuranceInstitution \
   --broadcast \
   --rpc-url "$RPC_URL" \
   --private-key "$PRIVATE_KEY" \
-  --sig "run(string)" "$INSURANCE_INSTITUTION_SERVER_URL" \
-  --retries "$RETRY_COUNT" \
-  -vvvv
-
-forge script \
-  ./script/DeployInsuranceInstitution.s.sol:DeployInsuranceInstitutionScript \
-  --broadcast \
-  --rpc-url "$RPC_URL" \
-  --private-key "$PRIVATE_KEY" \
-  --sig "run(address)" "$USDC_CONTRACT_ADDRESS" \
+  --sig 'run(address,address)' "$PERMIT2_CONTRACT_ADDRESS" "$USDC_CONTRACT_ADDRESS" \
+  --verify \
+  --verifier sourcify \
   --retries "$RETRY_COUNT" \
   -vvvv

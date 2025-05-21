@@ -1,9 +1,23 @@
 import type { Plan } from "@/lib/types";
 import type { FunctionComponent } from "react";
 import numeral from "numeral";
+import { BN } from "bn.js";
 
 export const PlanPricing: FunctionComponent<{
 	plan: Plan;
 }> = ({ plan }) => {
-	return <div>{numeral(plan.coverageLimit).format("0,0.00")} PUSDC</div>;
+	const processedPrice = new BN(plan.price.toString()).div(new BN(100));
+	const processedCoverageLimit = new BN(plan.coverageLimit.toString()).div(
+		new BN(100),
+	);
+
+	return (
+		<div>
+			<p>Price: {numeral(processedPrice.toString()).format("0,0.00")} PUSDC</p>
+			<p>
+				Coverage limit:{" "}
+				{numeral(processedCoverageLimit.toString()).format("0,0.00")} PUSDC
+			</p>
+		</div>
+	);
 };

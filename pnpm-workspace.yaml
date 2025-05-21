@@ -2,4 +2,5 @@
 packages:
 - ./packages/insurance/*
 - ./packages/medical/*
+- ./packages/shared/libs/*
 - ./packages/shared/*

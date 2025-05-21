@@ -1,12 +1,16 @@
 #! /usr/bin/env bash
 
-forge clean
+# forge clean
 
 forge script \
-  ./lib/permit2/test/utils/DeployPermit2.sol:DeployPermit2 \
+  ./script/DeployPermit2.s.sol:DeployPermit2 \
   --broadcast \
   --rpc-url "$RPC_URL" \
   --private-key "$PRIVATE_KEY" \
+  --via-ir \
+  --optimize \
+  --verify \
+  --verifier sourcify \
   --sig "run()" \
   --retries "$RETRY_COUNT" \
   -vvvv
@@ -17,5 +21,7 @@ forge script \
   --rpc-url "$RPC_URL" \
   --private-key "$PRIVATE_KEY" \
   --sig "run()" \
+  --verify \
+  --verifier sourcify \
   --retries "$RETRY_COUNT" \
   -vvvv
