@@ -5,7 +5,7 @@
     "dev": "pnpm --recursive --parallel dev",
     "build": "pnpm --recursive --parallel build",
     "typegen": "pnpm --recursive --parallel typegen",
-    "deploy": "./scripts/deploy.sh",
-    "setup": "./scripts/setup.sh"
+    "deploy:contracts": "./scripts/deploy-contracts.sh",
+    "setup:contracts": "./scripts/setup-contracts.sh"
   }
 }

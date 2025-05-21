@@ -2,6 +2,7 @@
 pragma solidity >=0.8.0;
 
 import {ERC20} from "solady/tokens/ERC20.sol";
+import {IInsuranceInstitution} from "insurance/IInsuranceInstitution.sol";
 
 contract MedicalInstitution {
     error USDCTransferFailed();
@@ -46,18 +47,23 @@ contract MedicalInstitution {
         OTHER
     }
 
-    address public immutable insuranceContractAddress;
+    address public immutable insuranceInstitutionContractAddress;
 
     address public immutable usdcContractAddress;
     mapping(address => bool) public registeredUsers;
     mapping(uint => UserVisit) public userVisits;
+    uint nextUserVisitId = 0;
 
     constructor(
-        address _usdcContractAddress,
-        address _insuranceContractAddress
+        address _insuranceInstitutionContractAddress,
+        address _usdcContractAddress
     ) {
+        insuranceInstitutionContractAddress = _insuranceInstitutionContractAddress;
         usdcContractAddress = _usdcContractAddress;
-        insuranceContractAddress = _insuranceContractAddress;
+    }
+
+    function isUserRegistered(address _userAddress) public view returns (bool) {
+        return registeredUsers[_userAddress];
     }
 
     function registerUser(address _userAddress) public {
@@ -82,54 +88,58 @@ contract MedicalInstitution {
         uint _nonce,
         bytes memory _insuranceSignature
     ) public {
-        if (!registeredUsers[_userAddress]) revert UserNotRegistered();
+        if (!isUserRegistered(_userAddress)) revert UserNotRegistered();
 
-        uint amountDue = getServiceCost(_purpose);
+        uint _amountDue = getServiceCost(_purpose);
 
-        uint _newVisitId = userVisits.length;
-        UserVisit storage newVisit = userVisits[_newVisitId];
-        _newVisit.id = _newVisitId;
+        UserVisit storage _newVisit = userVisits[nextUserVisitId];
+        _newVisit.id = nextUserVisitId;
         _newVisit.userAddress = _userAddress;
         _newVisit.purpose = _purpose;
         _newVisit.visitTimestamp = block.timestamp;
 
+        nextUserVisitId++;
+
         if (_insuranceSignature.length > 0) {
             IInsuranceInstitution insurance = IInsuranceInstitution(
-                insuranceContractAddress
+                insuranceInstitutionContractAddress
             );
-            uint insuranceUserId = userToInsuranceId[_userAddress];
+            IInsuranceInstitution.User memory insuranceUser = insurance
+                .getUserByAddress(_userAddress);
 
             insurance.processClaim(
                 _insuranceSignature,
-                insuranceUserId,
-                amountDue,
+                insuranceUser.id,
+                _amountDue,
                 _nonce
             );
-            emit InsuranceClaimSubmitted(
-                newVisit.id,
+            emit VisitProcessed(
+                _newVisit.id,
                 _userAddress,
                 _purpose,
-                amountDue,
-                _insuranceSignature,
-                _nonce
+                _amountDue
             );
-            emit VisitProcessed(newVisit.id, _userAddress, _purpose, amountDue);
         } else {
             ERC20 usdc = ERC20(usdcContractAddress);
             bool success = usdc.transferFrom(
                 _userAddress,
                 address(this),
-                amountDue
+                _amountDue
             );
             if (!success) revert USDCTransferFailed();
 
-            emit VisitProcessed(newVisit.id, _userAddress, _purpose, amountDue);
+            emit VisitProcessed(
+                _newVisit.id,
+                _userAddress,
+                _purpose,
+                _amountDue
+            );
         }
     }
 
     function getServiceCost(
         CoveredCondition _purpose
-    ) public pure returns (uint) {
+    ) public view returns (uint) {
         ERC20 usdcContract = ERC20(usdcContractAddress);
         uint _decimals = usdcContract.decimals();
 
