@@ -15,7 +15,7 @@ import { useForm } from "@tanstack/react-form";
 import { Loader2Icon } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { WalletClient } from "viem";
-import { invariant } from "@/lib/utils";
+import { invariant } from "@soe511/shared-frontend/utils";
 import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({

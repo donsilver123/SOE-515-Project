@@ -27,7 +27,7 @@ export const insuranceInstitutionAbi = [
       { name: '_price', internalType: 'uint256', type: 'uint256' },
       {
         name: '_coveredConditions',
-        internalType: 'enum InsuranceInstitution.CoveredCondition[]',
+        internalType: 'enum IInsuranceInstitution.CoveredCondition[]',
         type: 'uint8[]',
       },
     ],
@@ -79,7 +79,7 @@ export const insuranceInstitutionAbi = [
     outputs: [
       {
         name: '',
-        internalType: 'struct InsuranceInstitution.InsurancePlan',
+        internalType: 'struct IInsuranceInstitution.InsurancePlan',
         type: 'tuple',
         components: [
           { name: 'id', internalType: 'uint256', type: 'uint256' },
@@ -89,7 +89,7 @@ export const insuranceInstitutionAbi = [
           { name: 'price', internalType: 'uint256', type: 'uint256' },
           {
             name: 'coveredConditions',
-            internalType: 'enum InsuranceInstitution.CoveredCondition[]',
+            internalType: 'enum IInsuranceInstitution.CoveredCondition[]',
             type: 'uint8[]',
           },
         ],
@@ -104,7 +104,7 @@ export const insuranceInstitutionAbi = [
     outputs: [
       {
         name: '',
-        internalType: 'struct InsuranceInstitution.InsurancePlan[]',
+        internalType: 'struct IInsuranceInstitution.InsurancePlan[]',
         type: 'tuple[]',
         components: [
           { name: 'id', internalType: 'uint256', type: 'uint256' },
@@ -114,9 +114,35 @@ export const insuranceInstitutionAbi = [
           { name: 'price', internalType: 'uint256', type: 'uint256' },
           {
             name: 'coveredConditions',
-            internalType: 'enum InsuranceInstitution.CoveredCondition[]',
+            internalType: 'enum IInsuranceInstitution.CoveredCondition[]',
             type: 'uint8[]',
           },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_userAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'getUserByAddress',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct IInsuranceInstitution.User',
+        type: 'tuple',
+        components: [
+          { name: 'id', internalType: 'uint256', type: 'uint256' },
+          { name: 'walletAddress', internalType: 'address', type: 'address' },
+          { name: 'coverageLimit', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'remainingCoverage',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          { name: 'isRegistered', internalType: 'bool', type: 'bool' },
         ],
       },
     ],
@@ -129,7 +155,7 @@ export const insuranceInstitutionAbi = [
     outputs: [
       {
         name: '',
-        internalType: 'struct InsuranceInstitution.User',
+        internalType: 'struct IInsuranceInstitution.User',
         type: 'tuple',
         components: [
           { name: 'id', internalType: 'uint256', type: 'uint256' },
@@ -151,7 +177,7 @@ export const insuranceInstitutionAbi = [
     inputs: [
       {
         name: '_medicalInstitution',
-        internalType: 'struct InsuranceInstitution.MedicalInstitution',
+        internalType: 'struct IInsuranceInstitution.MedicalInstitution',
         type: 'tuple',
         components: [
           { name: 'id', internalType: 'uint256', type: 'uint256' },
@@ -171,7 +197,7 @@ export const insuranceInstitutionAbi = [
     inputs: [
       {
         name: '_plan',
-        internalType: 'struct InsuranceInstitution.InsurancePlan',
+        internalType: 'struct IInsuranceInstitution.InsurancePlan',
         type: 'tuple',
         components: [
           { name: 'id', internalType: 'uint256', type: 'uint256' },
@@ -181,7 +207,7 @@ export const insuranceInstitutionAbi = [
           { name: 'price', internalType: 'uint256', type: 'uint256' },
           {
             name: 'coveredConditions',
-            internalType: 'enum InsuranceInstitution.CoveredCondition[]',
+            internalType: 'enum IInsuranceInstitution.CoveredCondition[]',
             type: 'uint8[]',
           },
         ],
@@ -196,7 +222,7 @@ export const insuranceInstitutionAbi = [
     inputs: [
       {
         name: '_user',
-        internalType: 'struct InsuranceInstitution.User',
+        internalType: 'struct IInsuranceInstitution.User',
         type: 'tuple',
         components: [
           { name: 'id', internalType: 'uint256', type: 'uint256' },
@@ -530,5 +556,199 @@ export const insuranceInstitutionAbi = [
     ],
     name: 'UserAlreadyRegistered',
   },
+  { type: 'error', inputs: [], name: 'UserNotRegistered' },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// MedicalInstitution
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const medicalInstitutionAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      {
+        name: '_insuranceInstitutionContractAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+      {
+        name: '_usdcContractAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getOtherServiceEnum',
+    outputs: [
+      {
+        name: '',
+        internalType: 'enum MedicalInstitution.Service',
+        type: 'uint8',
+      },
+    ],
+    stateMutability: 'pure',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_service',
+        internalType: 'enum MedicalInstitution.Service',
+        type: 'uint8',
+      },
+    ],
+    name: 'getServiceCost',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getServices',
+    outputs: [{ name: '', internalType: 'string[]', type: 'string[]' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'insuranceInstitutionContractAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_userAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'isUserRegistered',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_userAddress', internalType: 'address', type: 'address' },
+      {
+        name: '_service',
+        internalType: 'enum MedicalInstitution.Service',
+        type: 'uint8',
+      },
+    ],
+    name: 'processVisit',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_userAddress', internalType: 'address', type: 'address' },
+      {
+        name: '_service',
+        internalType: 'enum MedicalInstitution.Service',
+        type: 'uint8',
+      },
+      { name: '_nonce', internalType: 'uint256', type: 'uint256' },
+      { name: '_insuranceSignature', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'processVisit',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_userAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'registerUser',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: 'registeredUsers',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    name: 'services',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'usdcContractAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    name: 'userVisits',
+    outputs: [
+      { name: 'id', internalType: 'uint256', type: 'uint256' },
+      { name: 'userAddress', internalType: 'address', type: 'address' },
+      {
+        name: 'service',
+        internalType: 'enum MedicalInstitution.Service',
+        type: 'uint8',
+      },
+      { name: 'visitTimestamp', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'userAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    name: 'UserRegistered',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'visitId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'userAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'service',
+        internalType: 'enum MedicalInstitution.Service',
+        type: 'uint8',
+        indexed: false,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'VisitProcessed',
+  },
+  { type: 'error', inputs: [], name: 'USDCTransferFailed' },
   { type: 'error', inputs: [], name: 'UserNotRegistered' },
 ] as const

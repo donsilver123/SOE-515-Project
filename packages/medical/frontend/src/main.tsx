@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 
 import * as TanstackQuery from "./integrations/tanstack-query/root-provider";
+import { Wagmi } from "@soe511/shared-frontend/components/wagmi/index";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
@@ -36,7 +37,9 @@ if (rootElement && !rootElement.innerHTML) {
 	root.render(
 		<StrictMode>
 			<TanstackQuery.Provider>
-				<RouterProvider router={router} />
+				<Wagmi.Provider>
+					<RouterProvider router={router} />
+				</Wagmi.Provider>
 			</TanstackQuery.Provider>
 		</StrictMode>,
 	);

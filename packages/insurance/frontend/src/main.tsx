@@ -3,7 +3,7 @@ import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 
 import * as TanstackQuery from "./integrations/tanstack-query/root-provider";
-import * as Wagmi from "./integrations/wagmi/root-provider.tsx";
+import { Wagmi } from "@soe511/shared-frontend/components/wagmi/index";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";

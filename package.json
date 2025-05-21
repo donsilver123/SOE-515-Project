@@ -1,11 +1,21 @@
 {
-  "$schema": "https://json.schemastore.org/package.json",
-  "name": "soe511",
-  "scripts": {
-    "dev": "pnpm --recursive --parallel dev",
-    "build": "pnpm --recursive --parallel build",
-    "typegen": "pnpm --recursive --parallel typegen",
-    "deploy:contracts": "./scripts/deploy-contracts.sh",
-    "setup:contracts": "./scripts/setup-contracts.sh"
-  }
+	"$schema": "https://json.schemastore.org/package.json",
+	"name": "soe511",
+	"scripts": {
+		"dev": "pnpm --recursive --parallel dev",
+		"build": "pnpm --recursive --parallel build",
+		"typegen": "pnpm --recursive --parallel typegen",
+		"deploy:contracts": "./scripts/deploy-contracts.sh",
+		"setup:contracts": "./scripts/setup-contracts.sh"
+	},
+	"devDependencies": {
+		"@types/bn.js": "^5.1.6"
+	},
+	"dependencies": {
+		"bn.js": "^5.2.2",
+		"abitype": "^1.0.8",
+		"true-myth": "^9.0.0",
+		"viem": "~2.28.3",
+		"zod": "^3.24.3"
+	}
 }

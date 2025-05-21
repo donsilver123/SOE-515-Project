@@ -1,25 +1,32 @@
 {
-  "$schema": "https://json.schemastore.org/package.json",
-  "name": "@soe511/shared-frontend",
-  "version": "1.0.0",
-  "description": "",
-  "exports": {
-    "./*": "./src/*.ts"
-  },
-  "scripts": {
-    "typegen": "wagmi generate"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.7.1",
-  "dependencies": {
-    "@soe511/insurance-contract": "workspace:^",
-    "@t3-oss/env-core": "^0.12.0",
-    "@wagmi/cli": "^2.3.0",
-    "abitype": "^1.0.8",
-    "permit2-sdk-viem": "^0.0.1",
-    "viem": "2.x",
-    "zod": "^3.24.2"
-  }
+	"$schema": "https://json.schemastore.org/package.json",
+	"name": "@soe511/shared-frontend",
+	"version": "1.0.0",
+	"description": "",
+	"exports": {
+		"./*": "./src/*.ts"
+	},
+	"scripts": {
+		"typegen": "wagmi generate"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"packageManager": "pnpm@10.7.1",
+	"dependencies": {
+		"@soe511/insurance-contract": "workspace:^",
+		"@soe511/medical-contract": "workspace:^",
+		"@t3-oss/env-core": "^0.12.0",
+		"@tanstack/react-query": "^5.76.1",
+		"@wagmi/cli": "^2.3.0",
+		"permit2-sdk-viem": "^0.0.1",
+		"react": "^19.1.0",
+		"tiny-invariant": "^1.3.3",
+		"viem": "2.x",
+		"wagmi": "^2.15.2",
+		"zod": "^3.24.2"
+	},
+	"devDependencies": {
+		"@types/react": "^19.0.8"
+	}
 }

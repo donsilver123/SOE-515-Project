@@ -1,15 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
-	component: App,
+	component: IndexPage,
+	loader: () => {
+		throw redirect({
+			to: "/login",
+		});
+	},
 });
 
-function App() {
-	return (
-		<div>
-			<Button>User end</Button>
-			<Button>Admin dashboard</Button>
-		</div>
-	);
+function IndexPage() {
+	return null;
 }

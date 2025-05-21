@@ -3,20 +3,16 @@ import {
 	useCheckUserAccountRegistration,
 	useRegisterUserAccount,
 } from "@/lib/auth";
-import {
-	createFileRoute,
-	invariant,
-	useNavigate,
-} from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Loader2Icon } from "lucide-react";
 import {
 	injected,
 	useAccount,
 	useConnect,
 	usePublicClient,
-	useReadContract,
 	useWalletClient,
 } from "wagmi";
+import { invariant } from "@soe511/shared-frontend/utils";
 
 export const Route = createFileRoute("/login")({
 	component: LoginPage,
@@ -55,10 +51,11 @@ function LoginPage() {
 	const connectWallet = () => connectAsync({ connector: injected() });
 
 	const registerUser = () => {
-		invariant(walletClient);
-		invariant(walletClient.account);
+		invariant(publicClient, "ERR_PUBLIC_CLIENT");
+		invariant(walletClient, "ERR_WALLET_CLIENT");
+		invariant(walletClient.account, "ERR_WALLET_CLIENT_ACCOUNT");
 
-		registerUserAccount({ walletClient });
+		registerUserAccount({ publicClient, walletClient });
 	};
 
 	if (isUserRegistered)

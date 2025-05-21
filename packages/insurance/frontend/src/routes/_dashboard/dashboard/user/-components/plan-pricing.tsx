@@ -1,7 +1,7 @@
-import type { Plan } from "@/lib/types";
 import type { FunctionComponent } from "react";
 import numeral from "numeral";
 import { BN } from "bn.js";
+import type { Plan } from "@soe511/shared-frontend/types";
 
 export const PlanPricing: FunctionComponent<{
 	plan: Plan;

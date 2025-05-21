@@ -12,18 +12,18 @@ contract MedicalInstitution {
     event VisitProcessed(
         uint visitId,
         address userAddress,
-        CoveredCondition purpose,
+        Service service,
         uint amount
     );
 
     struct UserVisit {
         uint id;
         address userAddress;
-        CoveredCondition purpose;
+        Service service;
         uint visitTimestamp;
     }
 
-    enum CoveredCondition {
+    enum Service {
         REGULAR_CHECKUP,
         CONSULTATION,
         INFECTIOUS_DISEASES,
@@ -47,6 +47,30 @@ contract MedicalInstitution {
         OTHER
     }
 
+    string[] public services = [
+        "REGULAR_CHECKUP",
+        "CONSULTATION",
+        "INFECTIOUS_DISEASES",
+        "RESPIRATORY_ILLNESS",
+        "CARDIOVASCULAR_DISEASES",
+        "GASTROINTESTINAL_DISORDERS",
+        "MUSCULOSKELETAL_CONDITIONS",
+        "MENTAL_HEALTH_SERVICES",
+        "MATERNITY_CARE",
+        "PEDIATRIC_CARE",
+        "EMERGENCY_CARE",
+        "SURGICAL_PROCEDURES",
+        "DIAGNOSTIC_TESTS",
+        "PRESCRIPTION_DRUGS",
+        "CANCER_TREATMENT",
+        "DIABETES_MANAGEMENT",
+        "ALLERGIES_AND_IMMUNOLOGY",
+        "REHABILITATION_SERVICES",
+        "VISION_CARE",
+        "DENTAL_CARE",
+        "OTHER"
+    ];
+
     address public immutable insuranceInstitutionContractAddress;
 
     address public immutable usdcContractAddress;
@@ -62,6 +86,10 @@ contract MedicalInstitution {
         usdcContractAddress = _usdcContractAddress;
     }
 
+    function getServices() public view returns (string[] memory) {
+        return services;
+    }
+
     function isUserRegistered(address _userAddress) public view returns (bool) {
         return registeredUsers[_userAddress];
     }
@@ -75,27 +103,24 @@ contract MedicalInstitution {
         emit UserRegistered(_userAddress);
     }
 
-    function processVisit(
-        address _userAddress,
-        CoveredCondition _purpose
-    ) public {
-        processVisit(_userAddress, _purpose, 0, bytes(""));
+    function processVisit(address _userAddress, Service _service) public {
+        processVisit(_userAddress, _service, 0, bytes(""));
     }
 
     function processVisit(
         address _userAddress,
-        CoveredCondition _purpose,
+        Service _service,
         uint _nonce,
         bytes memory _insuranceSignature
     ) public {
         if (!isUserRegistered(_userAddress)) revert UserNotRegistered();
 
-        uint _amountDue = getServiceCost(_purpose);
+        uint _amountDue = getServiceCost(_service);
 
         UserVisit storage _newVisit = userVisits[nextUserVisitId];
         _newVisit.id = nextUserVisitId;
         _newVisit.userAddress = _userAddress;
-        _newVisit.purpose = _purpose;
+        _newVisit.service = _service;
         _newVisit.visitTimestamp = block.timestamp;
 
         nextUserVisitId++;
@@ -116,7 +141,7 @@ contract MedicalInstitution {
             emit VisitProcessed(
                 _newVisit.id,
                 _userAddress,
-                _purpose,
+                _service,
                 _amountDue
             );
         } else {
@@ -131,25 +156,23 @@ contract MedicalInstitution {
             emit VisitProcessed(
                 _newVisit.id,
                 _userAddress,
-                _purpose,
+                _service,
                 _amountDue
             );
         }
     }
 
-    function getServiceCost(
-        CoveredCondition _purpose
-    ) public view returns (uint) {
+    function getServiceCost(Service _service) public view returns (uint) {
         ERC20 usdcContract = ERC20(usdcContractAddress);
         uint _decimals = usdcContract.decimals();
 
-        if (_purpose == CoveredCondition.REGULAR_CHECKUP) {
+        if (_service == Service.REGULAR_CHECKUP) {
             return 50 * _decimals;
-        } else if (_purpose == CoveredCondition.CONSULTATION) {
+        } else if (_service == Service.CONSULTATION) {
             return 100 * _decimals;
-        } else if (_purpose == CoveredCondition.EMERGENCY_CARE) {
+        } else if (_service == Service.EMERGENCY_CARE) {
             return 500 * _decimals;
-        } else if (_purpose == CoveredCondition.SURGICAL_PROCEDURES) {
+        } else if (_service == Service.SURGICAL_PROCEDURES) {
             return 1000 * _decimals;
         } else {
             return 75 * _decimals;

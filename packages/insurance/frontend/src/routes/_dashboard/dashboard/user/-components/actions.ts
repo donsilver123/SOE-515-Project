@@ -1,7 +1,7 @@
-import { invariant } from "@/lib/utils";
+import { invariant } from "@soe511/shared-frontend/utils";
 import { insuranceInstitutionAbi } from "@soe511/shared-frontend/abi";
 import { env } from "@soe511/shared-frontend/env";
-import { erc20Abi, type Hex, type PublicClient, type WalletClient } from "viem";
+import { erc20Abi, type PublicClient, type WalletClient } from "viem";
 import {
 	AllowanceTransfer,
 	AllowanceProvider,
@@ -10,8 +10,8 @@ import {
 	MaxAllowanceExpiration,
 	type PermitSingle,
 } from "permit2-sdk-viem";
-import type { Plan } from "@/lib/types";
-import { Result, Unit } from "true-myth";
+import { Result, type Unit } from "true-myth";
+import type { Plan } from "@soe511/shared-frontend/types";
 
 const PERMIT_DETAILS = [
 	{ name: "token", type: "address" },
