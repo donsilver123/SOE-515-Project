@@ -84,7 +84,6 @@ interface IInsuranceInstitution {
     function processClaim(
         bytes memory _signature,
         uint _userId,
-        uint _claimAmount,
-        uint _nonce
+        uint _claimAmount
     ) external;
 }

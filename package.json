@@ -4,6 +4,7 @@
 	"scripts": {
 		"dev": "pnpm --recursive --parallel dev",
 		"build": "pnpm --recursive --parallel build",
+		"build:contracts": "./scripts/build-contracts.sh",
 		"typegen": "pnpm --recursive --parallel typegen",
 		"deploy:contracts": "./scripts/deploy-contracts.sh",
 		"setup:contracts": "./scripts/setup-contracts.sh"

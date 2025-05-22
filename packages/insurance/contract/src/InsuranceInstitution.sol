@@ -224,9 +224,8 @@ contract InsuranceInstitution is IInsuranceInstitution {
             storage _existingMedicalInstitution = medicalInstitutions[
                 addressToMedicalInstitutionId[_contractAddress]
             ];
-        if (isMedicalInstitutionRegistered(_existingMedicalInstitution)) {
+        if (isMedicalInstitutionRegistered(_existingMedicalInstitution))
             revert MedicalInstitutionAlreadyRegistered(_contractAddress);
-        }
 
         uint _medicalInstitutionId = nextMedicalInstitutionId;
         MedicalInstitution storage _medicalInstitution = medicalInstitutions[
@@ -234,6 +233,7 @@ contract InsuranceInstitution is IInsuranceInstitution {
         ];
         _medicalInstitution.id = _medicalInstitutionId;
         _medicalInstitution.contractAddress = _contractAddress;
+        _medicalInstitution.isRegistered = true;
         _medicalInstitution.name = _name;
         _medicalInstitution.nonce = 0;
         nextMedicalInstitutionId++;
@@ -249,9 +249,8 @@ contract InsuranceInstitution is IInsuranceInstitution {
     function processClaim(
         bytes memory _signature,
         uint _userId,
-        uint _claimAmount,
-        uint _nonce
-    ) public {
+        uint _claimAmount
+    ) public override {
         MedicalInstitution memory _medicalInstitution = medicalInstitutions[
             addressToMedicalInstitutionId[msg.sender]
         ];
@@ -262,11 +261,9 @@ contract InsuranceInstitution is IInsuranceInstitution {
 
         if (!isUserRegistered(_user)) revert UserNotRegistered();
 
-        // if (
-        //     userIdToAuthorizedMedicalInstitutionIdToNonce[_user.id][
-        //         _medicalInstitution.id
-        //     ] == 0
-        // ) revert MedicalInstitutionNotAuthorizedByUser();
+        uint _nonce = userIdToAuthorizedMedicalInstitutionIdToNonce[_user.id][
+            _medicalInstitution.id
+        ];
 
         bytes32 _messageHash = keccak256(
             abi.encodePacked(

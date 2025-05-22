@@ -15,6 +15,7 @@ import { ServicePricing } from "./-components/service-pricing";
 
 const formSchema = z.object({
 	serviceId: z.number(),
+	price: z.bigint(),
 });
 
 export const Route = createFileRoute("/_dashboard/dashboard/user/")({
@@ -29,13 +30,15 @@ const UserDashboardForm: FunctionComponent<{
 	const form = useForm({
 		defaultValues: {
 			serviceId: 0,
+			price: 0n,
 		},
 		validators: {
 			onChange: formSchema,
 		},
-		onSubmit: async ({ value: { serviceId } }) => {
+		onSubmit: async ({ value: { price, serviceId } }) => {
 			const res = await processVisit({
 				service: services[serviceId],
+				price,
 				publicClient,
 				walletClient,
 			});
@@ -68,8 +71,8 @@ const UserDashboardForm: FunctionComponent<{
 								}
 								defaultValue={field.state.value.toString()}
 							>
-								{services.map((service) => (
-									<option key={service} value={service}>
+								{services.map((service, index) => (
+									<option key={service} value={index}>
 										{service}
 									</option>
 								))}
@@ -77,7 +80,12 @@ const UserDashboardForm: FunctionComponent<{
 						)}
 					</form.Field>
 				</div>
-				{services && <ServicePricing service={services[serviceId]} />}
+				{services && (
+					<ServicePricing
+						service={services[serviceId]}
+						onPriceLoad={(price) => form.setFieldValue("price", price)}
+					/>
+				)}
 				<div>
 					<Button type="submit" disabled={form.state.isSubmitting}>
 						{form.state.isSubmitting ? (

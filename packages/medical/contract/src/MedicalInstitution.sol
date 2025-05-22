@@ -104,13 +104,12 @@ contract MedicalInstitution {
     }
 
     function processVisit(address _userAddress, Service _service) public {
-        processVisit(_userAddress, _service, 0, bytes(""));
+        processVisit(_userAddress, _service, bytes(""));
     }
 
     function processVisit(
         address _userAddress,
         Service _service,
-        uint _nonce,
         bytes memory _insuranceSignature
     ) public {
         if (!isUserRegistered(_userAddress)) revert UserNotRegistered();
@@ -135,8 +134,7 @@ contract MedicalInstitution {
             insurance.processClaim(
                 _insuranceSignature,
                 insuranceUser.id,
-                _amountDue,
-                _nonce
+                _amountDue
             );
             emit VisitProcessed(
                 _newVisit.id,
@@ -167,15 +165,15 @@ contract MedicalInstitution {
         uint _decimals = usdcContract.decimals();
 
         if (_service == Service.REGULAR_CHECKUP) {
-            return 50 * _decimals;
+            return 50 * (10 ** _decimals);
         } else if (_service == Service.CONSULTATION) {
-            return 100 * _decimals;
+            return 100 * (10 ** _decimals);
         } else if (_service == Service.EMERGENCY_CARE) {
-            return 500 * _decimals;
+            return 500 * (10 ** _decimals);
         } else if (_service == Service.SURGICAL_PROCEDURES) {
-            return 1000 * _decimals;
+            return 1000 * (10 ** _decimals);
         } else {
-            return 75 * _decimals;
+            return 75 * (10 ** _decimals);
         }
     }
 }

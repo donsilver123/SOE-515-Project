@@ -12,6 +12,7 @@ import {
 } from "permit2-sdk-viem";
 import { Result, type Unit } from "true-myth";
 import type { Plan } from "@soe511/shared-frontend/types";
+import { toast } from "sonner";
 
 const PERMIT_DETAILS = [
 	{ name: "token", type: "address" },
@@ -37,11 +38,22 @@ export const purchasePlan = async ({
 	plan: Plan;
 	walletClient: WalletClient;
 	publicClient: PublicClient;
-}): Promise<Result<Unit, Unit>> => {
+}): Promise<Result<Unit, string>> => {
 	invariant(walletClient.chain, "ERR_WALLET_CLIENT_CHAIN");
 	invariant(walletClient.account, "ERR_WALLET_CLIENT_ACCOUNT");
 
 	try {
+		const tokenBalance = await publicClient.readContract({
+			address: env.VITE_USDC_CONTRACT_ADDRESS,
+			abi: erc20Abi,
+			functionName: "balanceOf",
+			args: [walletClient.account.address],
+		});
+
+		if (tokenBalance < plan.price) {
+			return Result.err("Insufficient balance");
+		}
+
 		const tokenAllowance = await publicClient.readContract({
 			address: env.VITE_USDC_CONTRACT_ADDRESS,
 			abi: erc20Abi,
@@ -132,6 +144,6 @@ export const purchasePlan = async ({
 		return Result.ok();
 	} catch (err) {
 		console.warn(err);
-		return Result.err();
+		return Result.err("Sorry an error occurred");
 	}
 };

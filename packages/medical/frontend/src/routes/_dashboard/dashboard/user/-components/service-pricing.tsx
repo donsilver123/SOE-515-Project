@@ -1,4 +1,4 @@
-import type { FunctionComponent } from "react";
+import { useEffect, type FunctionComponent } from "react";
 import numeral from "numeral";
 import { BN } from "bn.js";
 import type { Service } from "@soe511/shared-frontend/types";
@@ -6,8 +6,13 @@ import { useGetServiceCost } from "./hooks";
 
 export const ServicePricing: FunctionComponent<{
 	service: Service;
-}> = ({ service }) => {
+	onPriceLoad: (pricing: bigint) => void;
+}> = ({ service, onPriceLoad }) => {
 	const { status, data } = useGetServiceCost(service);
+
+	useEffect(() => {
+		if (status === "success") onPriceLoad(data);
+	}, [onPriceLoad, status, data]);
 
 	if (status === "pending") return "...";
 

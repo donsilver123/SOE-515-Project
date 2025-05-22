@@ -41,7 +41,7 @@ const UserDashboardForm: FunctionComponent<{
 			});
 
 			if (res.isErr) {
-				toast.warning("Sorry an error occurred!");
+				toast.warning(res.error);
 				return;
 			}
 

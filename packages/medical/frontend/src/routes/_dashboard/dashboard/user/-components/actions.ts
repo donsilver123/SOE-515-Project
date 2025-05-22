@@ -14,14 +14,16 @@ import { Result, type Unit } from "true-myth";
 import type { Service } from "@soe511/shared-frontend/types";
 import { invariant, serviceToEnum } from "@soe511/shared-frontend/utils";
 
-const MEDICAL_INSTITUTION_ID = 0;
+const MEDICAL_INSTITUTION_ID = 0n;
 
 export const processVisit = async ({
 	service,
+	price,
 	walletClient,
 	publicClient,
 }: {
 	service: Service;
+	price: bigint;
 	walletClient: WalletClient;
 	publicClient: PublicClient;
 }): Promise<Result<Unit, Unit>> => {
@@ -29,6 +31,13 @@ export const processVisit = async ({
 	invariant(walletClient.account, "ERR_WALLET_CLIENT_ACCOUNT");
 
 	try {
+		const user = await publicClient.readContract({
+			address: env.VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS,
+			abi: insuranceInstitutionAbi,
+			functionName: "getUserByAddress",
+			args: [walletClient.account.address],
+		});
+
 		const nonce = await publicClient.readContract({
 			address: env.VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS,
 			abi: insuranceInstitutionAbi,
@@ -36,7 +45,12 @@ export const processVisit = async ({
 			args: [BigInt(MEDICAL_INSTITUTION_ID)],
 		});
 
-		const hash = keccak256(encodePacked(["uint256"], [nonce]));
+		const hash = keccak256(
+			encodePacked(
+				["uint", "uint", "uint", "uint"],
+				[user.id, MEDICAL_INSTITUTION_ID, price, nonce],
+			),
+		);
 
 		const signature = await walletClient.signMessage({
 			message: { raw: hash },
@@ -50,7 +64,6 @@ export const processVisit = async ({
 			args: [
 				walletClient.account.address,
 				serviceToEnum(service),
-				nonce,
 				signature,
 			],
 			account: walletClient.account,
