@@ -77,6 +77,24 @@ contract InsuranceInstitution is IInsuranceInstitution {
         return users[addressToUserId[_userAddress]];
     }
 
+    function getUserNonceForMedicalInstitutionAuthorization(
+        uint _medicalInstitutionId
+    ) public view returns (uint) {
+        User memory _user = getUserByAddress(msg.sender);
+        if (!isUserRegistered(_user)) revert UserNotRegistered();
+
+        MedicalInstitution memory _medicalInstitution = medicalInstitutions[
+            _medicalInstitutionId
+        ];
+        if (!isMedicalInstitutionRegistered(_medicalInstitution))
+            revert MedicalInstitutionNotRegistered();
+
+        return
+            userIdToAuthorizedMedicalInstitutionIdToNonce[_user.id][
+                _medicalInstitution.id
+            ];
+    }
+
     function getUserById(uint _userId) public view returns (User memory) {
         return users[_userId];
     }
@@ -244,11 +262,11 @@ contract InsuranceInstitution is IInsuranceInstitution {
 
         if (!isUserRegistered(_user)) revert UserNotRegistered();
 
-        if (
-            userIdToAuthorizedMedicalInstitutionIdToNonce[_user.id][
-                _medicalInstitution.id
-            ] == 0
-        ) revert MedicalInstitutionNotAuthorizedByUser();
+        // if (
+        //     userIdToAuthorizedMedicalInstitutionIdToNonce[_user.id][
+        //         _medicalInstitution.id
+        //     ] == 0
+        // ) revert MedicalInstitutionNotAuthorizedByUser();
 
         bytes32 _messageHash = keccak256(
             abi.encodePacked(

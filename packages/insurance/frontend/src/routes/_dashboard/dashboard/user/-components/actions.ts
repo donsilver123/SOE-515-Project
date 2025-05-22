@@ -109,7 +109,8 @@ export const purchasePlan = async ({
 				address: env.VITE_INSURANCE_INSTITUTION_CONTRACT_ADDRESS,
 				abi: insuranceInstitutionAbi,
 				functionName: "permitAndPurchasePlan",
-				args: [permit, signature, plan.id],
+				// biome-ignore lint/suspicious/noExplicitAny: this doesn't work no matter how much I typecast it
+				args: [permit as any, signature, plan.id],
 				chain: walletClient.chain,
 				account: walletClient.account,
 			});

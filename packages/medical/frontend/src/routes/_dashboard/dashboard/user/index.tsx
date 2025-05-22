@@ -34,7 +34,7 @@ const UserDashboardForm: FunctionComponent<{
 			onChange: formSchema,
 		},
 		onSubmit: async ({ value: { serviceId } }) => {
-			const res = await purchasePlan({
+			const res = await processVisit({
 				service: services[serviceId],
 				publicClient,
 				walletClient,

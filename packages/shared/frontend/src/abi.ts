@@ -176,6 +176,19 @@ export const insuranceInstitutionAbi = [
     type: 'function',
     inputs: [
       {
+        name: '_medicalInstitutionId',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
+    ],
+    name: 'getUserNonceForMedicalInstitutionAuthorization',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
         name: '_medicalInstitution',
         internalType: 'struct IInsuranceInstitution.MedicalInstitution',
         type: 'tuple',
@@ -579,19 +592,6 @@ export const medicalInstitutionAbi = [
       },
     ],
     stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getOtherServiceEnum',
-    outputs: [
-      {
-        name: '',
-        internalType: 'enum MedicalInstitution.Service',
-        type: 'uint8',
-      },
-    ],
-    stateMutability: 'pure',
   },
   {
     type: 'function',
